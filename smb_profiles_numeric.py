@@ -18,6 +18,7 @@ disable parallel computations, just increase 'parallel_ts' (in years) to a very 
 #import sys
 #sys.path.insert(0, r'C:/Users/machguth/switchdrive/src/py/')
 
+import os
 import time
 import numpy as np
 import pandas as pd
@@ -61,7 +62,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
 
     #climate = r'C:/Horst/modeling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx' # annual climate data table
     #climate = r'C:/Users/Horst/switchdrive/_temp_modelling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'  # annual climate data table
-    climate = r'D:/_temp_modelling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'  # annual climate data table
+    climate = r'F:/_temp_modelling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'  # annual climate data table
     #climate = 'none' # set to 'none' if no climate table given
 
     # ---------------------------------------- Specify paleoclimate data v1 --------------------------------------------
@@ -83,7 +84,8 @@ if __name__=='__main__': # required to use parallel computation under Windows
     year_start = 47300
     #year_end = 28900 #10001 #109160
     #year_end = 10100 #116000
-    year_end = 15000  #116000
+    #year_end = 15000  #116000
+    year_end = 46000  # 116000
 
     #T_zpcl_lgm2 = [270.37, 263.97]  # (K) Mean annual air temperature at elevation z_stat and coldest phase (LGM)
     #T_zpcl_lgm2 = [270.17, 263.67]  # (K) Mean annual air temperature at elevation z_stat and coldest phase (LGM)
@@ -101,7 +103,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
     #hypsometry = r'C:/Horst/modeling/modelanalysis/dbdz/s1_hypsometry_mod.xlsx'
     #hypsometry = r'C:/Users/Horst/switchdrive/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod.xlsx'
     #hypsometry = r'H:/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod.xlsx'
-    hypsometry = r'D:/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod_v2.xlsx'
+    hypsometry = r'F:/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod_v2.xlsx'
     #hypsometry = r'C:/Horst/modeling/modelanalysis/dbdz/s2_hypsometry.xlsx'
 
     parallel_ts = 100. # (mass balance years) threshold for use of parallel computing (recommended around 100).
@@ -110,7 +112,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
     #outfolder = r'C:/Horst/modeling/modelanalysis/dbdz/'
     #outfolder = r'C:/Users/Horst/switchdrive/_temp_modelling/modeloutput/dbdz/'
     #outfolder = r'C:/Users/machguth/switchdrive/_temp_modelling/modeloutput/test/'
-    outfolder = r'D:/_temp_modelling/modeloutput/dbdz/'
+    outfolder = r'F:/_temp_modelling/modeloutput/test/'
     # --------------------------
 
     # #############################################  preparations  ####################################################
@@ -119,12 +121,17 @@ if __name__=='__main__': # required to use parallel computation under Windows
                                                                                      T_zpcl_pd, T_climate_lgm,
                                                                                      T_climate_pd, t_years)
 
+    # check if output folder exists, if no create
+    isdir = os.path.isdir(outfolder)
+    if not isdir:
+        os.mkdir(outfolder)
+
     # read the hypsometry
     df_hypso = pd.read_excel(hypsometry)  # , index_col = 'elevation')
     df_hypso['area'] = np.flip(df_hypso['area'].values, axis=0)  # flip the order of the entries to agree with order of dem and pdds arrays
     df_hypso['elevation'] = np.flip(df_hypso['elevation'].values, axis=0)  # flip the order of the entries to agree with order of dem and pdds arrays
     # --------------------------
-    dem = np.linspace(zmm[0], zmm[1], (zmm[0] - zmm[1])/step+1)
+    dem = np.linspace(zmm[0], zmm[1], int((zmm[0] - zmm[1])/step+1))
 
     pddf = np.array(pddf) # convert to numpy array
 

@@ -115,9 +115,9 @@ def plot_fig_3(clim_info, TAa, Tsd, T_zpcl, Tg, p_a, pddf, T_offset, p_offset,
 
     # define the axes
     if maxB - minB < 6:
-        smb_axis = np.linspace(maxB, minB, (maxB - minB)/0.25 + 1)
+        smb_axis = np.linspace(maxB, minB, int((maxB - minB)/0.25 + 1))
     else:
-       smb_axis = np.linspace(maxB, minB, (maxB - minB) / 0.5 + 1)
+       smb_axis = np.linspace(maxB, minB, int((maxB - minB) / 0.5 + 1))
 
     # Define major and minor ticks
     ymajor_ticks = np.arange(np.ceil(zmm[1]/maty)*maty, zmm[0]+1, maty)
