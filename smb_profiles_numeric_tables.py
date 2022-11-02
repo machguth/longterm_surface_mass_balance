@@ -18,6 +18,7 @@ import pandas as pd
 
 # *********************************************************************************************************************
 # convert table of daily b to monthly b
+# IS THIS PIECE OF CODE STILL USED? APPEARS TO BE CALLED NOWHERE
 def daily_to_monthly(bt_arr, t_years, t_start):
     ml = 365/12  # length of a month in days
     months_s = np.arange(0, 365, ml)
@@ -70,25 +71,27 @@ def daily_to_monthly(bt_arr, t_years, t_start):
 
     dates = ((years_monthly, months_monthly))
 
-    return(bm_arr, dates)
+    return (bm_arr, dates)
 
 
 # *********************************************************************************************************************
 # write output table nr. 1 (as XLSX)
 def write_output_table_xls1(outfolder, T_zpcl, df_out, pdds):
-    writer = pd.ExcelWriter(outfolder + 'out_table_num.xlsx')
+    #writer = pd.ExcelWriter(outfolder + 'out_table_num.xlsx')
     for ind, i in enumerate(T_zpcl):
         for i2 in range(2, 11):
             df_out.iloc[:, i2] = pdds[ind, i2-1]
-        df_out.to_excel(writer, 'Scenario_'+str(ind + 1))
-    writer.save()
+        # df_out.to_excel(writer, 'Scenario_'+str(ind + 1))
+        df_out.to_excel(outfolder + 'out_table_num.xlsx', sheet_name='Scenario_' + str(ind + 1))
+
+    #writer.save()
 
 
 # *********************************************************************************************************************
 # write output table nr. 2 (as XLSX)
 def write_output_table_xls2(outfolder, param_arr, T_raw, T_zpcl, year_start, year_end, mb_years):
-    writer = pd.ExcelWriter(outfolder + 'out_table_annual_parameters_yrs_' +
-                            str(int(year_start))+'-'+str(int(year_end))+'.xlsx')
+    # writer = pd.ExcelWriter(outfolder + 'out_table_annual_parameters_yrs_' +
+    #                         str(int(year_start))+'-'+str(int(year_end))+'.xlsx')
 
     # param_arr[case#, var#, year_mb]; variables = [B_glw, maxB, minB, dbdz, ELA, AAR]; glacier wide and annual
     df_out = pd.DataFrame(columns=['year', 'B (m w.e.)', 'B_max (m w.e.)', 'B_min (m w.e.)', 'db/dz (m (100 m)-1 yr-1)',
@@ -100,7 +103,7 @@ def write_output_table_xls2(outfolder, param_arr, T_raw, T_zpcl, year_start, yea
     years = np.arange(year_end, year_start, 1)
     years = years[::-1]  # reverse array
     # check length, usually there is one mb year less
-    # than total years (bcs. of mb years coresponding to hydrol. years)
+    # than total years (bcs. of mb years corresponding to hydrol. years)
     if len(years) > mb_years:
         years = years[:mb_years]
 
@@ -113,8 +116,9 @@ def write_output_table_xls2(outfolder, param_arr, T_raw, T_zpcl, year_start, yea
             df_out.iloc[:, i2+2] = param_arr[ind, i2, :]
         # for i2 in range(0, len(param_arr[ind, :,:])):
         #     df_out.iloc[:, i2+1] = param_arr[ind, i2,:]
-        df_out.to_excel(writer, 'Scenario_'+str(ind + 1))
-    writer.save()
+        df_out.to_excel(outfolder + 'out_table_annual_parameters_yrs_' +
+                        str(int(year_start))+'-'+str(int(year_end))+'.xlsx', sheet_name='Scenario_'+str(ind + 1))
+    #writer.save()
 
 
 # *********************************************************************************************************************
@@ -135,6 +139,7 @@ def write_output_tables_csv_vertical(outfolder, bm_arr, ind, dem, content):
                             quoting=csv.QUOTE_NONE, lineterminator='\n')  # ,escapechar='\\'
         writer.writerow(header)
         writer.writerows(bm_arr)
+
 
 
 # *********************************************************************************************************************
