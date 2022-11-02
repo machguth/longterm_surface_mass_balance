@@ -75,13 +75,12 @@ def climate_info(T_z1, TAa, Tg, delta_T, p_a, p_b, psi, z1, z2, ind, T_off, p_of
 
     if ind != -1:
         scenario = ind + 1
-        print('Scenario {:}'.format(scenario) + ' at {:}'.format(int(z2)) + ' m a.s.l. and at LGM:')
+        print('\n Scenario {:}'.format(scenario) + ' at {:}'.format(int(z2)) + ' m a.s.l., at start of time axis:')
         print('MAAT: {:.2f}'.format(MAATz2 - 273.15) + ' °C')
         print('Tmax: {:.2f}'.format(Tsz2 - 273.15) + ' °C')
         print('Tmin: {:.2f}'.format(Twz2 - 273.15) + ' °C')
         print('P: {:.2f}'.format(Pz2) + ' m/yr')
         print('Delta T: {:.2f}'.format(delta_T) + ' °C')
-        print('')
 
     return MAATz2, Tsz2, Twz2, Pz2
 
@@ -243,6 +242,9 @@ def smb_numerical(dem, t_arr, T0m, Tg, TAa, delta_T, p_a, p_b, psi, Ts, pddf,
         b_arr[0, :, 0], b_arr[0, :, 1], b_arr[0, :, 2], b_arr[0, :, 3], \
         b_arr[0, :, 4], b_arr[0, :, 5], b_arr[0, :, 6] = snow, \
                    firn, ice, btc, Ttz, (Ttz > 0.) * Ttz, Ttz_eff
+
+        if (day_abs / 3650000 == np.floor(day_abs / 3650000)):
+            print('Calculated ' + str(int(year)) + ' years.')
 
     return pdds, Ba_arr, Bm_arr, param_arr, year_mb, Tm_arr
 

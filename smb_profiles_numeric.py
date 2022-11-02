@@ -62,7 +62,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
 
     #climate = r'C:/Horst/modeling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx' # annual climate data table
     #climate = r'C:/Users/Horst/switchdrive/_temp_modelling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'  # annual climate data table
-    climate = r'E:/_temp_modelling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'  # annual climate data table
+    climate = r'F:/_temp_modelling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'  # annual climate data table
     #climate = 'none' # set to 'none' if no climate table given
 
     # ---------------------------------------- Specify paleoclimate data v1 --------------------------------------------
@@ -79,13 +79,10 @@ if __name__=='__main__': # required to use parallel computation under Windows
     # This block is ignored if no climate data table is given (climate == 'none')
 
     # Specify starting and end date according to years in climate table. Model runs from higher to lower year numbers
-    #year_start = 29000 #10139 #122840
-    #year_start = 122900
-    year_start = 47300
-    #year_end = 28900 #10001 #109160
-    #year_end = 10100 #116000
-    #year_end = 15000  #116000
-    year_end = 46800  # 116000
+    year_start = 122900
+    #year_start = 47300
+    year_end = 10100
+    #year_end = 47000  # 116000
 
     #T_zpcl_lgm2 = [270.37, 263.97]  # (K) Mean annual air temperature at elevation z_stat and coldest phase (LGM)
     #T_zpcl_lgm2 = [270.17, 263.67]  # (K) Mean annual air temperature at elevation z_stat and coldest phase (LGM)
@@ -103,7 +100,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
     #hypsometry = r'C:/Horst/modeling/modelanalysis/dbdz/s1_hypsometry_mod.xlsx'
     #hypsometry = r'C:/Users/Horst/switchdrive/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod.xlsx'
     #hypsometry = r'H:/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod.xlsx'
-    hypsometry = r'E:/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod_v2.xlsx'
+    hypsometry = r'F:/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod_v2.xlsx'
     #hypsometry = r'C:/Horst/modeling/modelanalysis/dbdz/s2_hypsometry.xlsx'
 
     parallel_ts = 100. # (mass balance years) threshold for use of parallel computing (recommended around 100).
@@ -112,19 +109,19 @@ if __name__=='__main__': # required to use parallel computation under Windows
     #outfolder = r'C:/Horst/modeling/modelanalysis/dbdz/'
     #outfolder = r'C:/Users/Horst/switchdrive/_temp_modelling/modeloutput/dbdz/'
     #outfolder = r'C:/Users/machguth/switchdrive/_temp_modelling/modeloutput/test/'
-    outfolder = r'E:/_temp_modelling/modeloutput/test/'
+    outfolder = r'F:/_temp_modelling/modeloutput/SMB_122900_10100/'
     # --------------------------
 
     # #############################################  preparations  ####################################################
-    T_raw, T_zpcl, TAa, delta_T, t_years, year_end, year_start = smbf.make_clim_arrs(climate, T_zpcl_lgm1, T_zpcl_lgm2,
-                                                                                     TAa, TAa_pd, year_end, year_start,
-                                                                                     T_zpcl_pd, T_climate_lgm,
-                                                                                     T_climate_pd, t_years)
-
     # check if output folder exists, if no create
     isdir = os.path.isdir(outfolder)
     if not isdir:
         os.mkdir(outfolder)
+
+    T_raw, T_zpcl, TAa, delta_T, t_years, year_end, year_start = smbf.make_clim_arrs(climate, T_zpcl_lgm1, T_zpcl_lgm2,
+                                                                                     TAa, TAa_pd, year_end, year_start,
+                                                                                     T_zpcl_pd, T_climate_lgm,
+                                                                                     T_climate_pd, t_years)
 
     # read the hypsometry
     df_hypso = pd.read_excel(hypsometry)  # , index_col = 'elevation')
@@ -198,8 +195,6 @@ if __name__=='__main__': # required to use parallel computation under Windows
         clim_info[ind, :] = smbf.climate_info(T_zpcl[ind][0], TAa[ind][0], Tg[ind], delta_T[ind][0],
                          p_a[ind], p_b[ind], psi[ind], z_paleoclim, z_paleoclim, ind, T_off[ind], p_off[ind])
 
-    print('---')
-
     if len(T_zpcl) * t_years < parallel_ts:  # decide whether parallel processing saves time or not
 
         # numerically calculate surface mass balance for all DEM grid cells (= elevation classes)
@@ -220,7 +215,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
         num_cores = mp.cpu_count()
         if num_cores > len(T_zpcl):
             num_cores = len(T_zpcl)
-        print('*** Using {:}'.format(num_cores) + ' cores in parallel processing. ***')
+        print('\n *** Using {:}'.format(num_cores) + ' cores in parallel processing. ***')
         print('')
 
         results = Parallel(n_jobs=num_cores)(delayed(smbf.smb_numerical)(dem, t_arr, T0m[ind], Tg[ind],

@@ -22,7 +22,8 @@ def write_output_table_xls1(outfolder, T_zpcl, df_out, pdds):
     with pd.ExcelWriter(outfolder + 'out_table_num.xlsx') as writer:
         for ind, i in enumerate(T_zpcl):
             for i2 in range(2, 11):
-                df_out.iloc[:, i2] = pdds[ind, i2-1]
+                df_out.iloc[:, i2] = pdds[ind, i2 - 1]
+                df_out.iloc[:, i2] = pdds[ind, i2 - 1]
             # df_out.to_excel(writer, 'Scenario_'+str(ind + 1))
             df_out.to_excel(writer, sheet_name='Scenario_' + str(ind + 1))
 
