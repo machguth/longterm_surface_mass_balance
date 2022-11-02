@@ -250,21 +250,27 @@ if __name__=='__main__': # required to use parallel computation under Windows
     Bm = np.array(Bm)
     Tm = np.array(Tm)
 
+    # Modify Ba for the purpose of writing output, also add time axis
+    t_axis = np.arange(year_start-1, year_end, -1)  # -1 as first year is not a complete SMB year (autumn start)
+    Ba = Ba.transpose((0,2,1))
+    Ba = np.insert(Ba, 0, t_axis, axis=2)
+
     print('---')
     print('diff. B glacier-wide (of first two scenarios, last year): %s' % (param_arr[0, 0, -1] - param_arr[1, 0, -1]))
     print('---')
 
     for ind, i in enumerate(T_zpcl):
-        smbt.write_output_tables_csv_vertical(outfolder, Bm[ind, :, :], ind, dem, 'mass-balance')
+        smbt.write_output_tables_csv_vertical(outfolder, Bm[ind, :, :], ind, dem, 'monthly', 'mass-balance')
+        smbt.write_output_tables_csv_vertical(outfolder, Ba[ind, :, :], ind, dem, 'annual', 'mass-balance')
 
     for ind, i in enumerate(T_zpcl):
-        smbt.write_output_tables_csv_vertical(outfolder, Tm[ind, :, :], ind, dem, 'air-temperature')
+        smbt.write_output_tables_csv_vertical(outfolder, Tm[ind, :, :], ind, dem, 'monthly', 'air-temperature')
 
     # Plotting - three different plots are created
     smbp.plot_fig_1(outfolder, T_zpcl, dem, pdds[:, :, :, -1])
     smbp.plot_fig_2(outfolder, pdds[:, 3, :, -1], pdds[:, 4, :, -1], pdds[:, :, :, -1], TAa)
     smbp.plot_fig_3(clim_info, TAa, Tsd, T_zpcl, Tg, p_a, pddf, T_offset, p_offset, outfolder,
-                   param_arr[:, 1, -1], param_arr[:, 2, -1], zmm, dem, Ba[:, :, -1], param_arr[:, 0, -1],
+                   param_arr[:, 1, -1], param_arr[:, 2, -1], zmm, dem, Ba[:, -1, 1:], param_arr[:, 0, -1],
                     df_hypso, param_arr[:, 3, -1], param_arr[:, 4, -1], param_arr[:, 5, -1], z_paleoclim)
 
     # Write output tables
