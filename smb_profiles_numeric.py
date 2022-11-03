@@ -36,8 +36,8 @@ if __name__=='__main__': # required to use parallel computation under Windows
     # --------------------------
     T_zpcl_pd = 281.9  # (K) Mean annual air temperature at elevation z_stat, present-day value
     TAa_pd = 8.75  # (K) Annual amplitude of air temperature, present-day value
-    TAa = [8.75, 15]  # (K) Air temperature, annual amplitude, LGM conditions
-    #TAa = [15, 15]  # (K) Air temperature, annual amplitude, LGM conditions
+    #TAa = [8.75, 15]  # (K) Air temperature, annual amplitude, LGM conditions
+    TAa = [15, 15]  # (K) Air temperature, annual amplitude, LGM conditions
     Tsd = [3.5, 3.5]  # (K) Standard deviation daily air temperature ==> set to zero to suppress daily cycle of T
     Tg = [0.006, 0.006]  # (K m-1) Temperature lapse rate
     Ts = 1  # (°C) threshold temperature snowfall and rain
@@ -47,8 +47,8 @@ if __name__=='__main__': # required to use parallel computation under Windows
 
     p_a = [0.0002857, 0.0002857]  # () factor a in: p = a*z + b, where z is elevation and p is present-day annual precip
     p_b = [1.1412, 1.1412]  # (m) factor b in: p = a*z + b, where z is elevation and p is present-day annual precip
-    psi = [0.0704, 0.0704]  # () psi in: p_scale = exp(psi * delta_T_lgm), Huybrechts (2002); set 0 for p_scale = 1.
-    #psi = [0.0704, 0.028]  # () psi in: p_scale = exp(psi * delta_T_lgm), Huybrechts (2002); set 0 for p_scale = 1.
+    #psi = [0.0704, 0.0704]  # () psi in: p_scale = exp(psi * delta_T_lgm), Huybrechts (2002); set 0 for p_scale = 1.
+    psi = [0.0704, 0.028]  # () psi in: p_scale = exp(psi * delta_T_lgm), Huybrechts (2002); set 0 for p_scale = 1.
 
     pddf = [3.297, 6, 8.791]  # (mm K-1 d-1) degree day factors, first for snow, second for firn, third for ice
 
@@ -70,8 +70,8 @@ if __name__=='__main__': # required to use parallel computation under Windows
 
     #T_zpcl_lgm1 = [270.37, 263.97] # (K) Mean annual air temperature at elevation z_stat
     #T_zpcl_lgm1 = [270.17, 263.67] # (K) Mean annual air temperature at elevation z_stat
-    T_zpcl_lgm1 = [270.9, 264.65]  # (K) Mean annual air temperature at elevation z_stat
-    #T_zpcl_lgm1 = [264.65, 266.9] # (K) Mean annual air temperature at elevation z_stat
+    #T_zpcl_lgm1 = [270.9, 264.65]  # (K) Mean annual air temperature at elevation z_stat
+    T_zpcl_lgm1 = [266.9, 266.9] # (K) Mean annual air temperature at elevation z_stat
 
     t_years = 100  # (years) number of years to calculate - ignored if 'climate' table is given
 
@@ -86,8 +86,8 @@ if __name__=='__main__': # required to use parallel computation under Windows
 
     #T_zpcl_lgm2 = [270.37, 263.97]  # (K) Mean annual air temperature at elevation z_stat and coldest phase (LGM)
     #T_zpcl_lgm2 = [270.17, 263.67]  # (K) Mean annual air temperature at elevation z_stat and coldest phase (LGM)
-    T_zpcl_lgm2 = [270.9, 264.65]  # (K) Mean annual air temperature at elevation z_stat and coldest phase (LGM)
-    #T_zpcl_lgm2 = [270.9, 266.9]  # (K) Mean annual air temperature at elevation z_stat and coldest phase (LGM)
+    #T_zpcl_lgm2 = [270.9, 264.65]  # (K) Mean annual air temperature at elevation z_stat and coldest phase (LGM)
+    T_zpcl_lgm2 = [266.9, 266.9]  # (K) Mean annual air temperature at elevation z_stat and coldest phase (LGM)
 
     # correct for polar amplification (i.e. polar temperature variability > mid-latitudal)
     T_climate_pd = -29  # (°C) Temperature in 'climate' that corresponds to present-day T at T_zpcl(delta_T_lgm == 0)
