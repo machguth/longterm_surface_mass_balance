@@ -347,7 +347,20 @@ def smb_param_glacier_wide(B, dem, df_hypso, step):
 
 # ******************************************************************************************************************
 # calculate refreezing
-def mb1l_refreeze(Srad, Q, num, jstart_c, day, tg, triang, gl_mask_sg, t_bias_corr, snow, firn):
+def refreeze(refreeze_param):
+
+    """ This module calculates the retention factor Cmax (see Reeh, 1991). Cmax is either (i) assumed 0.6 according
+    to Reeh (1991) or (ii) is calculated as a function of firn temperature according to Pfeffer et al. (1991) and with
+    help of a firn density fucntion by Reeh et al. (2005).
+    Reeh (1991) result in a fixed retention fraction over all years and elevations.
+    Pfeffer et al (1991) / Reeh et al. (2005) result in a retention fraction that varies as a function of
+    annual air temperatures, thus varying over time and elevation.
+    In the combined Pfeffer et al. (1991) / Reeh et al. (2005) approach, firn temperature is approximated based on
+    annual mean air temperature. Firn temperature here is not the average annual firn temperature but
+    represents more the spring firn temperature at relatively shallow depth. It can thus be approximated by
+    annual mean air temperature.
+    In case of using approach (ii), an error in the equation by Pfeffer et al. (1991) was corrected (STILL
+    NEEDS TO BE IMPLEMENTED). """
 
     # required parameters
     retention_reeh91 = 0.6  # Fixed value
@@ -362,7 +375,7 @@ def mb1l_refreeze(Srad, Q, num, jstart_c, day, tg, triang, gl_mask_sg, t_bias_co
     retention_max = retention_reeh91  + ann_mean_T * 0. # make an array out of retention_max
 
     # *************************************** start of model run ***************************************************
-    # modify placeholder. Here the initial retention fraction is defined. Is simply set to 0 as already
+    # MODIFY PLACEHOLDER "begin_of_model_run". Here the initial retention fraction is defined. Is simply set to 0 as already
     # beginning next year a retention fraction is defined based on either a fixed value (Reeh_1991) or
     # based on air temperature (Pfeffer_1991+Reeh_2005)
     if begin_of_model_run:
@@ -378,10 +391,11 @@ def mb1l_refreeze(Srad, Q, num, jstart_c, day, tg, triang, gl_mask_sg, t_bias_co
 
         # determine the relevant values
         ann_mean_T = t_data
-        rho_firn = (625. + 18.7 * ann_mean_T + 0.293 * ann_mean_T**2.)/1000.  # convert from kg m-3 to kg dm-1
+
+        # Following Reeh et al. (2005): calculate firn density and convert from kg m-3 to kg dm-1
+        rho_firn = (625. + 18.7 * ann_mean_T + 0.293 * ann_mean_T**2.)/1000.
 
         # calculate retention_max
-        # Reeh_1991 and Pfeffer_1991+Rehh_2005 result in static retention_max for each year
 
         # fixed fraction of the water equivalent of the snow cover can be refrozen
         if refreeze_param == 'Reeh_1991':
@@ -389,6 +403,7 @@ def mb1l_refreeze(Srad, Q, num, jstart_c, day, tg, triang, gl_mask_sg, t_bias_co
 
         # refreezing potential depends on firn T and firn rho. firn density calculation from Reeh 2005
         if refreeze_param == 'Pfeffer_1991+Reeh_2005':
+            # Calculate the ratio of melt/accumulation (= Cmax) according to Pfeffer et al. (1991)
             retention_max = (Ci/Lm * (-1.) * ann_mean_T + ((rho_pc - rho_firn) / rho_firn)) * \
                             (1. + ((rho_pc - rho_firn) / rho_firn))**(-1.)
             retention_max = np.where(retention_max < 0, 0, retention_max)
