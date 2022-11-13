@@ -347,7 +347,7 @@ def smb_param_glacier_wide(B, dem, df_hypso, step):
 
 # ******************************************************************************************************************
 # calculate refreezing
-def refreeze(refreeze_param):
+def refreezing(refreeze_parameterization):
 
     """ This module calculates the retention factor Cmax (see Reeh, 1991). Cmax is either (i) assumed 0.6 according
     to Reeh (1991) or (ii) is calculated as a function of firn temperature according to Pfeffer et al. (1991) and with
@@ -415,4 +415,4 @@ def refreeze(refreeze_param):
         print('mean retention_max:        ', np.mean(retention_max))
         print('======================================================')
 
-    return []
+    return retention_max

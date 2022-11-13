@@ -50,6 +50,12 @@ if __name__=='__main__': # required to use parallel computation under Windows
     #psi = [0.0704, 0.0704]  # () psi in: p_scale = exp(psi * delta_T_lgm), Huybrechts (2002); set 0 for p_scale = 1.
     psi = [0.0704, 0.028]  # () psi in: p_scale = exp(psi * delta_T_lgm), Huybrechts (2002); set 0 for p_scale = 1.
 
+    # Calculating refreezing of meltwater. Two parameterizations can be used, either 'Reeh91' or 'Pfeffer91-Reeh05'
+    # 'Reeh91' uses fixed fraction of snow w.e. to calculate amount of meltwater that refreezes before runoff starts
+    # 'Pfeffer91-Reeh05' calculates fraction of snow w.e. based on firn T (using MAAT)
+    refreeze = [False, False]  # specify whether refreezing of meltwater is simulated
+    refreeze_parameterization = ['Reeh91', 'Reeh91']  # parameterization to be used
+
     pddf = [3.297, 6, 8.791]  # (mm K-1 d-1) degree day factors, first for snow, second for firn, third for ice
 
     #zmm = [3150, 350]  # (m a.s.l.) max and min elevation z for calculation, identical to "hypsometry"
@@ -64,6 +70,10 @@ if __name__=='__main__': # required to use parallel computation under Windows
     #climate = r'C:/Users/Horst/switchdrive/_temp_modelling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'  # annual climate data table
     climate = r'F:/_temp_modelling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'  # annual climate data table
     #climate = 'none' # set to 'none' if no climate table given
+
+    # Note that delta_T_lgm, that is MAAT difference between present-day and LGM (coldest) conditions,
+    # is not explicitly defined. Instead, it is specified implicitly by chosing values for T_zpcl_pd and
+    # T_zpcl_lgm.
 
     # ---------------------------------------- Specify paleoclimate data v1 --------------------------------------------
     # This block is ignored if climate data table is given (climate == r'/some/path/')
@@ -89,12 +99,9 @@ if __name__=='__main__': # required to use parallel computation under Windows
     #T_zpcl_lgm2 = [270.9, 264.65]  # (K) Mean annual air temperature at elevation z_stat and coldest phase (LGM)
     T_zpcl_lgm2 = [266.9, 266.9]  # (K) Mean annual air temperature at elevation z_stat and coldest phase (LGM)
 
-    # correct for polar amplification (i.e. polar temperature variability > mid-latitudal)
-    T_climate_pd = -29  # (°C) Temperature in 'climate' that corresponds to present-day T at T_zpcl(delta_T_lgm == 0)
+    # correct for polar amplification (i.e. polar temperature variability > mid-latitudinal T variability)
+    T_climate_pd = -29  # (°C) Temperature in 'climate' that corresponds to present-day T at T_zpcl (delta_T_lgm == 0)
     T_climate_lgm = -49  # (°C) Temperature in 'climate' that corresponds to LGM T at T_zpcl(maximal delta_T_lgm)
-
-    #delta_T_lgm = [-11, -17.95] # (K) Temperature difference MAAT between present-day and LGM (coldest) conditions
-    #delta_T_lgm = [-11, -17.95] # (K) Temperature difference MAAT between present-day and LGM (coldest) conditions
 
     # ----------------------------------------- Specify hypsometry -------------------------------------------------
     #hypsometry = r'C:/Horst/modeling/modelanalysis/dbdz/s1_hypsometry_mod.xlsx'
@@ -118,6 +125,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
     if not isdir:
         os.mkdir(outfolder)
 
+    # Initiate the climate data arrays
     T_raw, T_zpcl, TAa, delta_T, t_years, year_end, year_start = smbf.make_clim_arrs(climate, T_zpcl_lgm1, T_zpcl_lgm2,
                                                                                      TAa, TAa_pd, year_end, year_start,
                                                                                      T_zpcl_pd, T_climate_lgm,
@@ -135,7 +143,6 @@ if __name__=='__main__': # required to use parallel computation under Windows
     # if climate change simulations are done, simply extend some arrays to include four instead of two scenarios
     # the additional scenarios are identical to the first two, except for the imposed change in climate
     if T_offset != 0 or p_offset != 0:
-        #T_zpcl = [T_zpcl[0], T_zpcl[1], T_zpcl[0] + T_offset, T_zpcl[1] + T_offset]
         T_zpcl = [T_zpcl[0], T_zpcl[1], T_zpcl[0], T_zpcl[1]]
         p_a = [p_a[0], p_a[1], p_a[0], p_a[1]]
         p_b = [p_b[0], p_b[1], p_b[0], p_b[1]]
@@ -195,7 +202,8 @@ if __name__=='__main__': # required to use parallel computation under Windows
         clim_info[ind, :] = smbf.climate_info(T_zpcl[ind][0], TAa[ind][0], Tg[ind], delta_T[ind][0],
                          p_a[ind], p_b[ind], psi[ind], z_paleoclim, z_paleoclim, ind, T_off[ind], p_off[ind])
 
-    if len(T_zpcl) * t_years < parallel_ts:  # decide whether parallel processing saves time or not
+    # decide whether parallel processing saves time or not
+    if len(T_zpcl) * t_years < parallel_ts:
 
         # numerically calculate surface mass balance for all DEM grid cells (= elevation classes)
         for ind, i in enumerate(T_zpcl):
