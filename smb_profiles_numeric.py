@@ -37,67 +37,69 @@ if __name__=='__main__': # required to use parallel computation under Windows
     T_zpcl_pd = 281.9  # (K) Mean annual air temperature at elevation z_stat, present-day value
     TAa_pd = 8.75  # (K) Annual amplitude of air temperature, present-day value
     #TAa = [8.75, 15]  # (K) Air temperature, annual amplitude, LGM conditions
-    TAa = [15, 15]  # (K) Air temperature, annual amplitude, LGM conditions
-    Tsd = [3.5, 3.5]  # (K) Standard deviation daily air temperature ==> set to zero to suppress daily cycle of T
-    Tg = [0.006, 0.006]  # (K m-1) Temperature lapse rate
+    TAa = [8.75, 15, 15, 15]  # (K) Air temperature, annual amplitude, LGM conditions
+    #TAa = [15, 15]  # (K) Air temperature, annual amplitude, LGM conditions
+    #Tsd = [3.5, 3.5]  # (K) Standard deviation daily air temperature ==> set to zero to suppress daily cycle of T
+    Tsd = [3.5, 3.5, 3.5, 3.5]  # (K) Standard deviation daily air temperature ==> set to zero to suppress daily cycle of T
+    #Tg = [0.006, 0.006]  # (K m-1) Temperature lapse rate
+    Tg = [0.006, 0.006, 0.006, 0.006]  # (K m-1) Temperature lapse rate
     Ts = 1  # (°C) threshold temperature snowfall and rain
 
-    T_offset = 0  # (K) offset for simulating impact of climate change
-    p_offset = 0  # (m yr-1) offset for simulating impact of climate change
+    # T_offset = 0  # (K) offset for simulating impact of climate change
+    # p_offset = 0  # (m yr-1) offset for simulating impact of climate change
 
-    p_a = [0.0002857, 0.0002857]  # () factor a in: p = a*z + b, where z is elevation and p is present-day annual precip
-    p_b = [1.1412, 1.1412]  # (m) factor b in: p = a*z + b, where z is elevation and p is present-day annual precip
+    T_off = [0, 0, 0, 0]  # (K) offset for simulating impact of climate change
+    p_off = [0, 0, 0, 0]  # (m yr-1) offset for simulating impact of climate change
+
+    #p_a = [0.0002857, 0.0002857]  # () factor a in: p = a*z + b, where z is elevation and p is present-day annual precip
+    p_a = [0.0002857, 0.0002857, 0.0002857, 0.0002857]  # () factor a in: p = a*z + b, where z is elevation and p is present-day annual precip
+    #p_b = [1.1412, 1.1412]  # (m) factor b in: p = a*z + b, where z is elevation and p is present-day annual precip
+    p_b = [1.1412, 1.1412, 1.1412, 1.1412]  # (m) factor b in: p = a*z + b, where z is elevation and p is present-day annual precip
     #psi = [0.0704, 0.0704]  # () psi in: p_scale = exp(psi * delta_T_lgm), Huybrechts (2002); set 0 for p_scale = 1.
-    psi = [0.0704, 0.028]  # () psi in: p_scale = exp(psi * delta_T_lgm), Huybrechts (2002); set 0 for p_scale = 1.
+    #psi = [0.0704, 0.028]  # () psi in: p_scale = exp(psi * delta_T_lgm), Huybrechts (2002); set 0 for p_scale = 1.
+    psi = [0.0704, 0.0704, 0.0704, 0.028]  # () psi in: p_scale = exp(psi * delta_T_lgm), Huybrechts (2002); set 0 for p_scale = 1.
 
     # Calculating refreezing of meltwater. Two parameterizations can be used, either 'Reeh91' or 'Pfeffer91-Reeh05'
     # 'Reeh91' uses fixed fraction of snow w.e. to calculate amount of meltwater that refreezes before runoff starts
     # 'Pfeffer91-Reeh05' calculates fraction of snow w.e. based on firn T (using MAAT)
-    refreeze = [False, False]  # specify whether refreezing of meltwater is simulated
-    refreeze_parameterization = ['Reeh91', 'Reeh91']  # parameterization to be used
+    #refreeze = [False, False]  # specify whether refreezing of meltwater is simulated
+    refreeze = [False, False, False, False]  # specify whether refreezing of meltwater is simulated
+    #refreeze_parameterization = ['Reeh91', 'Reeh91']  # parameterization to be used
+    refreeze_parameterization = ['Reeh91', 'Reeh91', 'Reeh91', 'Reeh91']  # parameterization to be used
 
     pddf = [3.297, 6, 8.791]  # (mm K-1 d-1) degree day factors, first for snow, second for firn, third for ice
 
     #zmm = [3150, 350]  # (m a.s.l.) max and min elevation z for calculation, identical to "hypsometry"
-    zmm = [3250, 50]  # (m a.s.l.) max and min elevation z for calculation, identical to "hypsometry"
+    zmm = [3250, 50]    # (m a.s.l.) max and min elevation z for calculation, identical to "hypsometry"
     step = 100          # (m) elevation step for calculation of B, identical to "hypsometry"
 
-    z_paleoclim = 400  # (m a.s.l.) elevation for which quantitative paleoclimate dTAa exist
+    z_paleoclim = 400   # (m a.s.l.) elevation for which quantitative paleoclimate dTAa exist
 
-    t_start = 274  # (julian days) always start calculation October 1 (day of year 274)
+    t_start = 274       # (julian days) always start calculation October 1 (day of year 274)
 
-    #climate = r'C:/Horst/modeling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx' # annual climate data table
-    #climate = r'C:/Users/Horst/switchdrive/_temp_modelling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'  # annual climate data table
-    climate = r'F:/_temp_modelling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'  # annual climate data table
-    #climate = 'none' # set to 'none' if no climate table given
+    # Table of annual air temperature. Comment out to trigger linear run over a duration of "t_years"
+    #climate = r'C:/Horst/modeling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'
+    climate = r'E:/_temp_modelling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'
 
     # Note that delta_T_lgm, that is MAAT difference between present-day and LGM (coldest) conditions,
     # is not explicitly defined. Instead, it is specified implicitly by chosing values for T_zpcl_pd and
     # T_zpcl_lgm.
 
-    # ---------------------------------------- Specify paleoclimate data v1 --------------------------------------------
-    # This block is ignored if climate data table is given (climate == r'/some/path/')
+    # ---------------------------------------- Specify paleoclimate data --------------------------------------------
+    t_years = 100  # (years) number of years to calculate - used if 'climate' table is not given.
 
-    #T_zpcl_lgm1 = [270.37, 263.97] # (K) Mean annual air temperature at elevation z_stat
-    #T_zpcl_lgm1 = [270.17, 263.67] # (K) Mean annual air temperature at elevation z_stat
-    #T_zpcl_lgm1 = [270.9, 264.65]  # (K) Mean annual air temperature at elevation z_stat
-    T_zpcl_lgm1 = [266.9, 266.9] # (K) Mean annual air temperature at elevation z_stat
+    # Start and end year BP of model run. Model runs from higher to lower year numbers. Used if climate table.
+    #year_start = 122900  # (years BP)
+    year_start = 27200  # (years BP)
+    #year_end = 10100  # (years BP)
+    year_end = 27000  # (years BP)
 
-    t_years = 100  # (years) number of years to calculate - ignored if 'climate' table is given
-
-    # ---------------------------------------- Specify paleoclimate data v2 --------------------------------------------
-    # This block is ignored if no climate data table is given (climate == 'none')
-
-    # Specify starting and end date according to years in climate table. Model runs from higher to lower year numbers
-    year_start = 122900
-    #year_start = 47300
-    year_end = 10100
-    #year_end = 47000  # 116000
-
-    #T_zpcl_lgm2 = [270.37, 263.97]  # (K) Mean annual air temperature at elevation z_stat and coldest phase (LGM)
-    #T_zpcl_lgm2 = [270.17, 263.67]  # (K) Mean annual air temperature at elevation z_stat and coldest phase (LGM)
-    #T_zpcl_lgm2 = [270.9, 264.65]  # (K) Mean annual air temperature at elevation z_stat and coldest phase (LGM)
-    T_zpcl_lgm2 = [266.9, 266.9]  # (K) Mean annual air temperature at elevation z_stat and coldest phase (LGM)
+    # Mean annual air temperature at elevation z_stat and coldest phase (LGM), in Kelvin
+    #T_zpcl_lgm = [270.37, 263.97]  # (K)
+    #T_zpcl_lgm = [270.17, 263.67]  # (K)
+    #T_zpcl_lgm = [270.9, 264.65]  # (K)
+    #T_zpcl_lgm = [266.9, 266.9]  # (K)
+    T_zpcl_lgm = [270.9, 264.65, 266.9, 266.9]  # (K)
 
     # correct for polar amplification (i.e. polar temperature variability > mid-latitudinal T variability)
     T_climate_pd = -29  # (°C) Temperature in 'climate' that corresponds to present-day T at T_zpcl (delta_T_lgm == 0)
@@ -106,8 +108,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
     # ----------------------------------------- Specify hypsometry -------------------------------------------------
     #hypsometry = r'C:/Horst/modeling/modelanalysis/dbdz/s1_hypsometry_mod.xlsx'
     #hypsometry = r'C:/Users/Horst/switchdrive/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod.xlsx'
-    #hypsometry = r'H:/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod.xlsx'
-    hypsometry = r'F:/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod_v2.xlsx'
+    hypsometry = r'E:/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod_v2.xlsx'
     #hypsometry = r'C:/Horst/modeling/modelanalysis/dbdz/s2_hypsometry.xlsx'
 
     parallel_ts = 100. # (mass balance years) threshold for use of parallel computing (recommended around 100).
@@ -116,7 +117,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
     #outfolder = r'C:/Horst/modeling/modelanalysis/dbdz/'
     #outfolder = r'C:/Users/Horst/switchdrive/_temp_modelling/modeloutput/dbdz/'
     #outfolder = r'C:/Users/machguth/switchdrive/_temp_modelling/modeloutput/test/'
-    outfolder = r'F:/_temp_modelling/modeloutput/SMB_122900_10100/'
+    outfolder = r'E:/_temp_modelling/modeloutput/SMB_test_27200_27000/'
     # --------------------------
 
     # #############################################  preparations  ####################################################
@@ -125,8 +126,12 @@ if __name__=='__main__': # required to use parallel computation under Windows
     if not isdir:
         os.mkdir(outfolder)
 
+    # check if climate table is given. If not, create a dummy variable
+    if 'climate' not in locals():
+        climate = 'none'
+
     # Initiate the climate data arrays
-    T_raw, T_zpcl, TAa, delta_T, t_years, year_end, year_start = smbf.make_clim_arrs(climate, T_zpcl_lgm1, T_zpcl_lgm2,
+    T_raw, T_zpcl, TAa, delta_T, t_years, year_end, year_start = smbf.make_clim_arrs(climate, T_zpcl_lgm,
                                                                                      TAa, TAa_pd, year_end, year_start,
                                                                                      T_zpcl_pd, T_climate_lgm,
                                                                                      T_climate_pd, t_years)
@@ -142,21 +147,21 @@ if __name__=='__main__': # required to use parallel computation under Windows
 
     # if climate change simulations are done, simply extend some arrays to include four instead of two scenarios
     # the additional scenarios are identical to the first two, except for the imposed change in climate
-    if T_offset != 0 or p_offset != 0:
-        T_zpcl = [T_zpcl[0], T_zpcl[1], T_zpcl[0], T_zpcl[1]]
-        p_a = [p_a[0], p_a[1], p_a[0], p_a[1]]
-        p_b = [p_b[0], p_b[1], p_b[0], p_b[1]]
-        psi = [psi[0], psi[1], psi[0], psi[1]]
-        Tg = [Tg[0], Tg[1], Tg[0], Tg[1]]
-        TAa = [TAa[0], TAa[1], TAa[0], TAa[1]]
-        delta_T = [delta_T[0], delta_T[1], delta_T[0], delta_T[1]]
-        Tsd = [Tsd[0], Tsd[1], Tsd[0], Tsd[1]]
-        T_off = [0, 0, T_offset, T_offset]
-        p_off = [0, 0, p_offset, p_offset]
+    #if T_offset != 0 or p_offset != 0:
+        # --> T_zpcl = [T_zpcl[0], T_zpcl[1], T_zpcl[0], T_zpcl[1]]
+        #p_a = [p_a[0], p_a[1], p_a[0], p_a[1]]
+        #p_b = [p_b[0], p_b[1], p_b[0], p_b[1]]
+        #psi = [psi[0], psi[1], psi[0], psi[1]]
+        #Tg = [Tg[0], Tg[1], Tg[0], Tg[1]]
+        # --> TAa = [TAa[0], TAa[1], TAa[0], TAa[1]]
+        # --> delta_T = [delta_T[0], delta_T[1], delta_T[0], delta_T[1]]
+        #Tsd = [Tsd[0], Tsd[1], Tsd[0], Tsd[1]]
+        #T_off = [0, 0, T_offset, T_offset]
+        #p_off = [0, 0, p_offset, p_offset]
 
-    if T_offset == 0 and p_offset == 0:
-        T_off = [0, 0]
-        p_off = [0, 0]
+    #if T_offset == 0 and p_offset == 0:
+        #T_off = [0, 0]
+        #p_off = [0, 0]
 
     # establish an array of temperature at sea level for each of the scenarios
     T0m = [0] * len(T_zpcl)
@@ -211,7 +216,8 @@ if __name__=='__main__': # required to use parallel computation under Windows
                 smbf.smb_numerical(dem, t_arr, T0m[ind], Tg[ind],
                                    TAa[ind], delta_T[ind], p_a[ind], p_b[ind], psi[ind], Ts,
                                    pddf, Tsd[ind], df_hypso, step, t_years, months, z_paleoclim,
-                                   T_off[ind], p_off[ind])
+                                   T_off[ind], p_off[ind], refreeze[ind], refreeze_parameterization[ind])
+
             Bm.append(Bmt)
             Tm.append(Tmt)
             print('finished numerical calculation #' + str(ind) + ' of a total of ' + str(
@@ -229,7 +235,8 @@ if __name__=='__main__': # required to use parallel computation under Windows
         results = Parallel(n_jobs=num_cores)(delayed(smbf.smb_numerical)(dem, t_arr, T0m[ind], Tg[ind],
                                              TAa[ind], delta_T[ind], p_a[ind], p_b[ind], psi[ind], Ts, pddf,
                                              Tsd[ind], df_hypso, step, t_years, months, z_paleoclim,
-                                             T_off[ind], p_off[ind]) for ind, i in enumerate(T_zpcl))
+                                             T_off[ind], p_off[ind], refreeze[ind], refreeze_parameterization[ind])
+                                             for ind, i in enumerate(T_zpcl))
 
         a1, a2, a3, a4, a5, a6 = zip(*results)
 
@@ -272,7 +279,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
     # Plotting - three different plots are created
     smbp.plot_fig_1(outfolder, T_zpcl, dem, pdds[:, :, :, -1])
     smbp.plot_fig_2(outfolder, pdds[:, 3, :, -1], pdds[:, 4, :, -1], pdds[:, :, :, -1], TAa)
-    smbp.plot_fig_3(clim_info, TAa, Tsd, T_zpcl, Tg, p_a, pddf, T_offset, p_offset, outfolder,
+    smbp.plot_fig_3(clim_info, TAa, Tsd, T_zpcl, Tg, p_a, pddf, T_off, p_off, outfolder,
                    param_arr[:, 1, -1], param_arr[:, 2, -1], zmm, dem, Ba[:, -1, 1:], param_arr[:, 0, -1],
                     df_hypso, param_arr[:, 3, -1], param_arr[:, 4, -1], param_arr[:, 5, -1], z_paleoclim)
 

@@ -83,7 +83,7 @@ def plot_fig_2(outfolder, maxT, minT, pdds, TAa):
 
 # *********************************************************************************************************************
 # Plot 3: mass balance profiles
-def plot_fig_3(clim_info, TAa, Tsd, T_zpcl, Tg, p_a, pddf, T_offset, p_offset,
+def plot_fig_3(clim_info, TAa, Tsd, T_zpcl, Tg, p_a, pddf, T_off, p_off,
                outfolder, maxB, minB, zmm, dem, B, B_glw, df_hypso,
                dbdz, ELA, AAR, z_paleoclim):
 
@@ -100,7 +100,7 @@ def plot_fig_3(clim_info, TAa, Tsd, T_zpcl, Tg, p_a, pddf, T_offset, p_offset,
                 + '__P{:.3f}'.format(clim_info[0, 3]) + ' {:.3f}'.format(clim_info[1, 3]) + '__Tg{:.2f}'.format(
                 Tg[0] * 1000) + ' {:2f}'.format(Tg[1]) + '__Pg{:}'.format(p_a[0]) \
                 + ' {:}'.format(p_a[1]) + '__PDD{:.1f}'.format(pddf[0]) + ' {:.1f}'.format(
-                pddf[1]) + '__T_offset{:.1f}'.format(T_offset) + '__p_offset{:.2f}'.format(p_offset)
+                pddf[1]) # + '__T_offset{:.1f}'.format(T_offset) + '__p_offset{:.2f}'.format(p_offset)
 
     out_fig = outfolder + 'smb_prof_num_'+specifier+'.pdf'
 
@@ -147,7 +147,7 @@ def plot_fig_3(clim_info, TAa, Tsd, T_zpcl, Tg, p_a, pddf, T_offset, p_offset,
         else:
             ax1.plot(B[ind], dem, color=colours[ind], linewidth=1.6)
 
-    # *** Second plot: plot the delta b
+    # *** third plot: plot the hypsometry
     ax2.barh(dem, df_hypso['area']*0.001, height=50, align='edge')  # align='center',
     ax2.set_ylim([zmm[1], zmm[0]])
     ax2.set_yticks(ymajor_ticks)
@@ -155,12 +155,13 @@ def plot_fig_3(clim_info, TAa, Tsd, T_zpcl, Tg, p_a, pddf, T_offset, p_offset,
     minorLocator2 = AutoMinorLocator()
     ax2.xaxis.set_minor_locator(minorLocator2)
 
-    # *** Third plot: plot the hypsometry
-    if T_offset != 0 or p_offset != 0:
-        ax3.plot(B[2] - B[0], dem, color='r', linewidth=1.0, linestyle='dotted')
-        ax3.plot(B[3] - B[1], dem, color='b', linewidth=1.0, linestyle='dotted')
-    else:
-        ax3.plot(B[1] - B[0], dem, color='black', linewidth=1.0, linestyle='dashed')
+    # *** Secondd plot: plot the delta b
+    ax3.plot(B[1] - B[0], dem, color='black', linewidth=1.0, linestyle='dashed')
+    # if T_offset != 0 or p_offset != 0:
+    #     ax3.plot(B[2] - B[0], dem, color='r', linewidth=1.0, linestyle='dotted')
+    #     ax3.plot(B[3] - B[1], dem, color='b', linewidth=1.0, linestyle='dotted')
+    # else:
+    #     ax3.plot(B[1] - B[0], dem, color='black', linewidth=1.0, linestyle='dashed')
 
     ax3.set_ylim([zmm[1], zmm[0]])
     ax3.set_yticks(ymajor_ticks)
@@ -191,18 +192,18 @@ def plot_fig_3(clim_info, TAa, Tsd, T_zpcl, Tg, p_a, pddf, T_offset, p_offset,
                      r' | ELA: {:} m a.s.l.'.format(int(ELA[ind])),
                      fontdict=fonts[2], size=6)  # (100 m)$^{-1}$
 
-    if T_offset != 0 or p_offset != 0:
-        TOffStr = str(T_offset)
-        pOffStr = str(p_offset)
-        yi = yTop - (ind + 1) * yShift / 1.3
-        ax1.plot([xLeft, xLeft + xShift], [yi, yi], color='r', linewidth=1.0, linestyle='dotted')
-        yi = yTop - (ind+2)*yShift/1.3
-        ax1.plot([xLeft, xLeft + xShift], [yi, yi], color='b', linewidth=1.0, linestyle='dotted')
-        ax1.text(xLeft + xShift + xShift/5, yi + yShift / 5,
-                 r'}', fontdict=fonts[2], size=12)
-        ax1.text(xLeft + 2 * xShift, yi + yShift / 4,
-                 r'$\Delta b$ (m w.e.) for $T_{offset}$=' + TOffStr + r' K, $p_{offset}$=' + pOffStr + r' m yr$^{-1}$',
-                 fontdict=fonts[2], size=6)
+    # if T_offset != 0 or p_offset != 0:
+    #     TOffStr = str(T_offset)
+    #     pOffStr = str(p_offset)
+    #     yi = yTop - (ind + 1) * yShift / 1.3
+    #     ax1.plot([xLeft, xLeft + xShift], [yi, yi], color='r', linewidth=1.0, linestyle='dotted')
+    #     yi = yTop - (ind+2)*yShift/1.3
+    #     ax1.plot([xLeft, xLeft + xShift], [yi, yi], color='b', linewidth=1.0, linestyle='dotted')
+    #     ax1.text(xLeft + xShift + xShift/5, yi + yShift / 5,
+    #              r'}', fontdict=fonts[2], size=12)
+    #     ax1.text(xLeft + 2 * xShift, yi + yShift / 4,
+    #              r'$\Delta b$ (m w.e.) for $T_{offset}$=' + TOffStr + r' K, $p_{offset}$=' + pOffStr + r' m yr$^{-1}$',
+    #              fontdict=fonts[2], size=6)
 
     # now plot all the information on the applied variable combinations
     # for better readability first only the variable names and units
@@ -297,10 +298,11 @@ def plot_fig_3(clim_info, TAa, Tsd, T_zpcl, Tg, p_a, pddf, T_offset, p_offset,
     ax2.set_xlabel('A (in 1000 km$^2$)')
     ax1.set_title('surface mass balance', fontdict=fonts[2])
     ax2.set_title('hypsometry', fontdict=fonts[2])
-    if T_offset != 0 or p_offset != 0:
-        ax3.set_title('$\Delta b$ (B4-B2; B3-B1)', fontdict=fonts[2])
-    else:
-        ax3.set_title('$\Delta b$ (B2-B1)', fontdict=fonts[2])
+    # if T_offset != 0 or p_offset != 0:
+    #     ax3.set_title('$\Delta b$ (B4-B2; B3-B1)', fontdict=fonts[2])
+    # else:
+    #     ax3.set_title('$\Delta b$ (B2-B1)', fontdict=fonts[2])
+    ax3.set_title('$\Delta b$ (B2-B1)', fontdict=fonts[2])
     ax3.set_xlabel('$\Delta b$ (m w.e.)')
     plt.tight_layout()
     plt.savefig(out_fig)

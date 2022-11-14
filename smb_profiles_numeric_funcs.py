@@ -25,42 +25,78 @@ import scipy.special as sp
 
 
 # ###################################################   functions   ###################################################
-def make_clim_arrs(climate, T_zpcl_lgm1, T_zpcl_lgm2, TAa, TAa_pd, year_end, year_start, T_zpcl_pd,
+def make_clim_arrs(climate, T_zpcl_lgm, TAa, TAa_pd, year_end, year_start, T_zpcl_pd,
                    T_climate_lgm, T_climate_pd, t_years):
 
-    if climate == 'none':  # Check whether an array of annual air temperatures is given
-        T_zpcl_lgm1 = np.array(T_zpcl_lgm1)
-        delta_T_lgm = T_zpcl_lgm1 - T_zpcl_pd
-        # below +1 year as, e.g., calcul. for one year (365 days) stretches over yr. 0 and yr. 1 (two years)
-        temp = np.zeros((2, t_years + 1))
-        delta_T = np.zeros((2, t_years + 1))
-        delta_T[0, :], delta_T[1, :] = delta_T_lgm[0], delta_T_lgm[1]
-        temp[0, :], temp[1, :] = T_zpcl_lgm1[0], T_zpcl_lgm1[1]
-        T_zpcl = temp
-        clim_rel = np.full(len(temp[0, :]), np.NAN)
-        year_end, year_start = 0, t_years
+    T_zpcl_lgm = np.array(T_zpcl_lgm)
+    delta_T_lgm = T_zpcl_lgm - T_zpcl_pd
+    n = len(T_zpcl_lgm)  # number of scenarios
 
-        # no need to modify seasonality if no climatology specified (in this case TAa is constant)
-        TAa = [np.full(t_years + 1, TAa[0]), np.full(t_years + 1, TAa[1])]
+    if climate == 'none':  # Check whether an array of annual air temperatures is given
+        # # below +1 year as, e.g., calcul. for one year (365 days) stretches over yr. 0 and yr. 1 (two years)
+        # temp = np.zeros((2, t_years + 1))
+        # delta_T = np.zeros((2, t_years + 1))
+        # delta_T[0, :], delta_T[1, :] = delta_T_lgm[0], delta_T_lgm[1]
+        # temp[0, :], temp[1, :] = T_zpcl_lgm[0], T_zpcl_lgm[1]
+        # T_zpcl = temp
+        # clim_rel = np.full(len(temp[0, :]), np.NAN)
+        # year_end, year_start = 0, t_years
+        #
+        # # no need to modify seasonality if no climatology specified (in this case TAa is constant)
+        # TAa = [np.full(t_years + 1, TAa[0]), np.full(t_years + 1, TAa[1])]
+
+        # below +1 year as, e.g., calcul. for one year (365 days) stretches over yr. 0 and yr. 1 (two years)
+        temp = np.zeros((n, t_years + 1))
+        delta_T = np.zeros((n, t_years + 1))
+
+        for i in np.arange(n):
+
+            # THIS NEEDS MODIFICATION
+            delta_T[0, :], delta_T[1, :] = delta_T_lgm[0], delta_T_lgm[1]
+            temp[0, :], temp[1, :] = T_zpcl_lgm[0], T_zpcl_lgm[1]
+            T_zpcl = temp
+            clim_rel = np.full(len(temp[0, :]), np.NAN)
+            year_end, year_start = 0, t_years
+
+            # no need to modify seasonality if no climatology specified (in this case TAa is constant)
+            TAa = [np.full(t_years + 1, TAa[0]), np.full(t_years + 1, TAa[1])]
 
     else:
-        T_zpcl_lgm2 = np.array(T_zpcl_lgm2)
-        delta_T_lgm = T_zpcl_lgm2 - T_zpcl_pd
+        # clim = pd.read_excel(climate)
+        # clim.set_index('year', inplace=True)
+        # clim_rel = clim.loc[year_end:year_start, 't(C)']  # slicing using loc includes both first and last element
+        # clim_rel = clim_rel[
+        #        ::-1].values  # + 273.16 # reverse order of elements in the array, convert to numpy array
+        #
+        # t_years = year_start - year_end
+        # T_scale = [delta_T_lgm[0] / (T_climate_lgm - T_climate_pd), delta_T_lgm[1] / (T_climate_lgm - T_climate_pd)]
+        # T_zpcl = [T_zpcl_lgm[0] + (clim_rel - T_climate_lgm) * T_scale[0],
+        #           T_zpcl_lgm[1] + (clim_rel - T_climate_lgm) * T_scale[1]]
+        #
+        # delta_T = [(clim_rel - T_climate_pd) * T_scale[0], (clim_rel - T_climate_pd) * T_scale[1]]
+        #
+        # TAa = [(delta_T_lgm[0] - (T_zpcl_lgm[0] - T_zpcl[0])) / delta_T_lgm[0] * (TAa[0] - TAa_pd) + TAa_pd,
+        #        (delta_T_lgm[1] - (T_zpcl_lgm[1] - T_zpcl[1])) / delta_T_lgm[1] * (TAa[1] - TAa_pd) + TAa_pd]
+
         clim = pd.read_excel(climate)
         clim.set_index('year', inplace=True)
         clim_rel = clim.loc[year_end:year_start, 't(C)']  # slicing using loc includes both first and last element
         clim_rel = clim_rel[
-               ::-1].values  # + 273.16 # reverse order of elements in the array, convert to numpy array and to K
+               ::-1].values  # + 273.16 # reverse order of elements in the array, convert to numpy array
 
         t_years = year_start - year_end
-        T_scale = [delta_T_lgm[0] / (T_climate_lgm - T_climate_pd), delta_T_lgm[1] / (T_climate_lgm - T_climate_pd)]
-        T_zpcl = [T_zpcl_lgm2[0] + (clim_rel - T_climate_lgm) * T_scale[0],
-                  T_zpcl_lgm2[1] + (clim_rel - T_climate_lgm) * T_scale[1]]
 
-        delta_T = [(clim_rel - T_climate_pd) * T_scale[0], (clim_rel - T_climate_pd) * T_scale[1]]
+        for i in np.arange(n):
 
-        TAa = [(delta_T_lgm[0] - (T_zpcl_lgm2[0] - T_zpcl[0])) / delta_T_lgm[0] * (TAa[0] - TAa_pd) + TAa_pd,
-               (delta_T_lgm[1] - (T_zpcl_lgm2[1] - T_zpcl[1])) / delta_T_lgm[1] * (TAa[1] - TAa_pd) + TAa_pd]
+            # THIS NEEDS MODIFICATION
+            T_scale = [delta_T_lgm[0] / (T_climate_lgm - T_climate_pd), delta_T_lgm[1] / (T_climate_lgm - T_climate_pd)]
+            T_zpcl = [T_zpcl_lgm[0] + (clim_rel - T_climate_lgm) * T_scale[0],
+                      T_zpcl_lgm[1] + (clim_rel - T_climate_lgm) * T_scale[1]]
+
+            delta_T = [(clim_rel - T_climate_pd) * T_scale[0], (clim_rel - T_climate_pd) * T_scale[1]]
+
+            TAa = [(delta_T_lgm[0] - (T_zpcl_lgm[0] - T_zpcl[0])) / delta_T_lgm[0] * (TAa[0] - TAa_pd) + TAa_pd,
+                   (delta_T_lgm[1] - (T_zpcl_lgm[1] - T_zpcl[1])) / delta_T_lgm[1] * (TAa[1] - TAa_pd) + TAa_pd]
 
     return clim_rel, T_zpcl, TAa, delta_T, t_years, year_end, year_start
 
@@ -88,7 +124,8 @@ def climate_info(T_z1, TAa, Tg, delta_T, p_a, p_b, psi, z1, z2, ind, T_off, p_of
 # *********************************************************************************************************************
 # the actual calculation of the surface mass balance
 def smb_numerical(dem, t_arr, T0m, Tg, TAa, delta_T, p_a, p_b, psi, Ts, pddf,
-                  Tsd, df_hypso, step, t_years, months, z_paleoclim, T_off, p_off):
+                  Tsd, df_hypso, step, t_years, months, z_paleoclim, T_off, p_off,
+                  refreeze, refreeze_parameterization):
 
     pddf = pddf/1000.  # convert PDDFs from mm d-1 °C-1 to m d-1 °C-1
 
@@ -116,19 +153,23 @@ def smb_numerical(dem, t_arr, T0m, Tg, TAa, delta_T, p_a, p_b, psi, Ts, pddf,
     for num, day_abs in enumerate(t_arr):  # FOR num = jstart_c, jend_c DO BEGIN
 
         # calculate day of the year (1-365 or 366)
-        day = day_abs - year*365
+        day = day_abs - year * 365
 
         # write to array of julian day numbers (from 1 to 365)
         t_arr_jul = np.roll(t_arr_jul, 1)
         t_arr_jul[0] = day
 
+        if num == 0:  # initialize refreezing
+            r_max = refreezing(refreeze, refreeze_parameterization, num, T0m, Tg, dem)
+
         mn = np.where(months[0,:] == day)
-        if len(mn[0]) == 1 and num > 31: # test if a month has just ended (and if enough total days have passed)
+        if len(mn[0]) == 1 and num > 31:  # test if a month has just ended (and if enough total days have passed)
             Bm_arr.append(daily_to_monthly_v2(bt_arr[:, :], year, t_arr_jul, months, mn[0], 'sum'))
             Tm_arr.append(daily_to_monthly_v2(b_arr[:, :, 4], year, t_arr_jul, months, mn[0], 'mean'))
 
-        if day_abs/365 == np.floor(day_abs/365):
+        if day_abs/365 == np.floor(day_abs/365):  # To be carried out every end of a year
             year += 1
+            r_max = refreezing(refreeze, refreeze_parameterization, num, T0m, Tg, dem)  # update refreezing
 
         if day_abs/365 == np.floor(day_abs/365) and num > 365:  # only to be executed after a full year has passed
             Ba_arr[:, year_mb] = b_arr[0, :, 3] - b_arr[364, :, 3]  # diff. between 1. and last day of the last 365 days
@@ -186,8 +227,7 @@ def smb_numerical(dem, t_arr, T0m, Tg, TAa, delta_T, p_a, p_b, psi, Ts, pddf,
         pot_smelt = (ls > 0.) * ls
 
         # --------------- central element ----------------
-        # calculates mass balance for day num (Bt) using
-        # smelt, fmelt and imelt
+        # calculates mass balance for day num (Bt) using smelt, fmelt and imelt
 
         # effective snow melt can't exceed amount of snow
         smelt = np.minimum(snow, pot_smelt)
@@ -318,7 +358,7 @@ def smb_param_dem(t_arr_jul, b_arr, dem, df_hypso):
 
 
 # *********************************************************************************************************************
-# use linear regression to calculate the ELA and surface mass balance gradients (only ablation area)
+# use linear regression to calculate the ELA and surface mass balance gradient of the ablation area
 def smb_param_glacier_wide(B, dem, df_hypso, step):
 
     abl_area = (np.where(B[:] < 0))[0]
@@ -347,7 +387,7 @@ def smb_param_glacier_wide(B, dem, df_hypso, step):
 
 # ******************************************************************************************************************
 # calculate refreezing
-def refreezing(refreeze_parameterization):
+def refreezing(refreeze, refreeze_parameterization, num, T0m, Tg, dem):
 
     """ This module calculates the retention factor Cmax (see Reeh, 1991). Cmax is either (i) assumed 0.6 according
     to Reeh (1991) or (ii) is calculated as a function of firn temperature according to Pfeffer et al. (1991) and with
@@ -362,57 +402,52 @@ def refreezing(refreeze_parameterization):
     In case of using approach (ii), an error in the equation by Pfeffer et al. (1991) was corrected (STILL
     NEEDS TO BE IMPLEMENTED). """
 
-    # required parameters
-    retention_reeh91 = 0.6  # Fixed value
-    t_data = []  # Is air temperature, to be obtained from arrays of air temperature at the dem elevations
-    Lm = 334000  # [J/kg] latent heat of water
-    Ci = 1950  # [J K-1 kg-1] volumetric heat capacity ice at approx. -5°C
-    rho_pc = 0.83  # [kg dm-3]  Porel close-off density
+    if refreeze:
 
-    # calculate parameters relevant to refreezing
-    ann_mean_T = t_data
-    rho_firn = (625. + 18.7 * ann_mean_T + 0.293 * ann_mean_T**2.)/1000. # convert from kg m-3 to kg dm-1
-    retention_max = retention_reeh91  + ann_mean_T * 0. # make an array out of retention_max
+        # required parameters
+        retention_reeh91 = 0.6  # Fixed value
+        Lm = 334000  # [J/kg] latent heat of water
+        Ci = 1950  # [J K-1 kg-1] volumetric heat capacity ice at approx. -5°C
+        rho_pc = 0.83  # [kg dm-3]  Porel close-off density
 
-    # *************************************** start of model run ***************************************************
-    # MODIFY PLACEHOLDER "begin_of_model_run". Here the initial retention fraction is defined. Is simply set to 0 as already
-    # beginning next year a retention fraction is defined based on either a fixed value (Reeh_1991) or
-    # based on air temperature (Pfeffer_1991+Reeh_2005)
-    if begin_of_model_run:
-        retention_max = retention_reeh91 * 0.  # set retention fraction to 0
+        # *************************************** start of model run ***************************************************
+        # Here the initial retention fraction is defined. Is simply set to 0 as already
+        # beginning next year a retention fraction is defined based on either a fixed value (Reeh_1991) or
+        # based on air temperature (Pfeffer_1991+Reeh_2005)
+        if num == 0:
+            r_max = dem * 0  # Array of zeros - set retention fraction to 0
 
-    # ***************************************** start of each year ************************************************
-    # update annual mean temperature, ice temperature (cold content) and refreezing potential at the beginning
-    # of the year:  originally update was placed at end of winter balance, this, however, could lead to issues
-    # in the calculation of refreezing potential if the new retention_max is lower and the refreezing potential is
-    # currently exhausted. in this case excess refreezing will be converted to runoff.
+        # ***************************************** start of each year ************************************************
+        # update annual mean temperature, ice temperature (cold content) and refreezing potential at the beginning
+        # of the year:  originally update was placed at end of winter balance, this, however, could lead to issues
+        # in the calculation of refreezing potential if the new r_max is lower and the refreezing potential is
+        # currently exhausted. in this case excess refreezing will be converted to runoff.
 
-    if month == 1 and dayofmonth == 2:  # this condition probably needs to be modified
+        # calculate r_max
+        if num > 0:  # do in all other cases. Note that r_max is calculated only every end of a year
 
-        # determine the relevant values
-        ann_mean_T = t_data
+            # fixed fraction of the water equivalent of the snow cover can be refrozen
+            if refreeze_parameterization == 'Reeh_1991':
+                r_max = retention_reeh91 + dem * 0
 
-        # Following Reeh et al. (2005): calculate firn density and convert from kg m-3 to kg dm-1
-        rho_firn = (625. + 18.7 * ann_mean_T + 0.293 * ann_mean_T**2.)/1000.
+            # refreezing potential depends on firn T and firn rho. firn density calculation from Reeh et al. (2005)
+            if refreeze_parameterization == 'Pfeffer_1991+Reeh_2005':
+                # determine the relevant values
+                ann_mean_T = T0m[year] - dem * Tg  # Ta, in "year", along DEM axis
+                # Following Reeh et al. (2005): calculate firn density and convert from kg m-3 to kg dm-1
+                rho_firn = (625 + 18.7 * ann_mean_T + 0.293 * ann_mean_T ** 2.) / 1000
+                # Calculate the ratio of melt/accumulation (= Cmax) according to Pfeffer et al. (1991)
+                r_max = (Ci/Lm * (-1) * ann_mean_T + ((rho_pc - rho_firn) / rho_firn)) * \
+                                (1 + ((rho_pc - rho_firn) / rho_firn))**(-1.)
+                r_max = np.where(r_max < 0, 0, r_max)
 
-        # calculate retention_max
+            print('======================================================')
+            print('mean ann_mean_T:           ', np.mean(ann_mean_T))
+            print('mean rho_firn:             ', np.mean(rho_firn))
+            print('mean r_max:        ', np.mean(r_max))
+            print('======================================================')
 
-        # fixed fraction of the water equivalent of the snow cover can be refrozen
-        if refreeze_param == 'Reeh_1991':
-            retention_max = retention_reeh91 + retention_max * 0.
+    else:
+        r_max = dem * 0  # array of zeros
 
-        # refreezing potential depends on firn T and firn rho. firn density calculation from Reeh 2005
-        if refreeze_param == 'Pfeffer_1991+Reeh_2005':
-            # Calculate the ratio of melt/accumulation (= Cmax) according to Pfeffer et al. (1991)
-            retention_max = (Ci/Lm * (-1.) * ann_mean_T + ((rho_pc - rho_firn) / rho_firn)) * \
-                            (1. + ((rho_pc - rho_firn) / rho_firn))**(-1.)
-            retention_max = np.where(retention_max < 0, 0, retention_max)
-
-
-        print('======================================================')
-        print('mean ann_mean_T:           ', np.mean(ann_mean_T))
-        print('mean rho_firn:             ', np.mean(rho_firn))
-        print('mean retention_max:        ', np.mean(retention_max))
-        print('======================================================')
-
-    return retention_max
+    return r_max
