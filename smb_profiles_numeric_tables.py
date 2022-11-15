@@ -24,7 +24,6 @@ def write_output_table_xls1(outfolder, T_zpcl, df_out, pdds):
             for i2 in range(2, 11):
                 df_out.iloc[:, i2] = pdds[ind, i2 - 1]
                 df_out.iloc[:, i2] = pdds[ind, i2 - 1]
-            # df_out.to_excel(writer, 'Scenario_'+str(ind + 1))
             df_out.to_excel(writer, sheet_name='Scenario_' + str(ind + 1))
 
 
@@ -33,7 +32,6 @@ def write_output_table_xls1(outfolder, T_zpcl, df_out, pdds):
 def write_output_table_xls2(outfolder, param_arr, T_raw, T_zpcl, year_start, year_end, mb_years):
     with pd.ExcelWriter(outfolder + 'out_table_annual_parameters_yrs_' +
                             str(int(year_start))+'-'+str(int(year_end))+'.xlsx') as writer:
-        # param_arr[case#, var#, year_mb]; variables = [B_glw, maxB, minB, dbdz, ELA, AAR]; glacier wide and annual
         df_out = pd.DataFrame(columns=['year', 'B (m w.e.)', 'B_max (m w.e.)', 'B_min (m w.e.)', 'db/dz (m (100 m)-1 yr-1)',
                                        'ELA (m a.s.l.)', 'AAR (-)', 'B_acc (GT)', 'T_GISP_raw (C)', 'MAAT@400 m asl.(°C)',
                                        'Tjuly@400 m asl.(°C)', 'Tjan@400 m asl.(°C)', 'P@400 m asl.(m yr-1)',

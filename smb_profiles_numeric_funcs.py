@@ -25,7 +25,7 @@ import scipy.special as sp
 
 
 # ###################################################   functions   ###################################################
-def make_clim_arrs(climate, T_zpcl_lgm, TAa, TAa_pd, year_end, year_start, T_zpcl_pd,
+def make_clim_arrs(climate, T_zpcl_lgm, TAat, TAa_pd, year_end, year_start, T_zpcl_pd,
                    T_climate_lgm, T_climate_pd, t_years):
 
     T_zpcl_lgm = np.array(T_zpcl_lgm)
@@ -33,71 +33,40 @@ def make_clim_arrs(climate, T_zpcl_lgm, TAa, TAa_pd, year_end, year_start, T_zpc
     n = len(T_zpcl_lgm)  # number of scenarios
 
     if climate == 'none':  # Check whether an array of annual air temperatures is given
-        # # below +1 year as, e.g., calcul. for one year (365 days) stretches over yr. 0 and yr. 1 (two years)
-        # temp = np.zeros((2, t_years + 1))
-        # delta_T = np.zeros((2, t_years + 1))
-        # delta_T[0, :], delta_T[1, :] = delta_T_lgm[0], delta_T_lgm[1]
-        # temp[0, :], temp[1, :] = T_zpcl_lgm[0], T_zpcl_lgm[1]
-        # T_zpcl = temp
-        # clim_rel = np.full(len(temp[0, :]), np.NAN)
-        # year_end, year_start = 0, t_years
-        #
-        # # no need to modify seasonality if no climatology specified (in this case TAa is constant)
-        # TAa = [np.full(t_years + 1, TAa[0]), np.full(t_years + 1, TAa[1])]
 
         # below +1 year as, e.g., calcul. for one year (365 days) stretches over yr. 0 and yr. 1 (two years)
-        temp = np.zeros((n, t_years + 1))
+        T_zpcl = np.zeros((n, t_years + 1))
         delta_T = np.zeros((n, t_years + 1))
+        TAa = []
 
         for i in np.arange(n):
+            delta_T[i, :] = delta_T_lgm[i]
+            T_zpcl[i, :] = T_zpcl_lgm[i]
+            TAa.append(np.full(t_years + 1, TAat[i]))
 
-            # THIS NEEDS MODIFICATION
-            delta_T[0, :], delta_T[1, :] = delta_T_lgm[0], delta_T_lgm[1]
-            temp[0, :], temp[1, :] = T_zpcl_lgm[0], T_zpcl_lgm[1]
-            T_zpcl = temp
-            clim_rel = np.full(len(temp[0, :]), np.NAN)
-            year_end, year_start = 0, t_years
-
-            # no need to modify seasonality if no climatology specified (in this case TAa is constant)
-            TAa = [np.full(t_years + 1, TAa[0]), np.full(t_years + 1, TAa[1])]
+        clim_rel = np.full(len(T_zpcl[0, :]), np.nan)
+        year_end, year_start = 0, t_years
 
     else:
-        # clim = pd.read_excel(climate)
-        # clim.set_index('year', inplace=True)
-        # clim_rel = clim.loc[year_end:year_start, 't(C)']  # slicing using loc includes both first and last element
-        # clim_rel = clim_rel[
-        #        ::-1].values  # + 273.16 # reverse order of elements in the array, convert to numpy array
-        #
-        # t_years = year_start - year_end
-        # T_scale = [delta_T_lgm[0] / (T_climate_lgm - T_climate_pd), delta_T_lgm[1] / (T_climate_lgm - T_climate_pd)]
-        # T_zpcl = [T_zpcl_lgm[0] + (clim_rel - T_climate_lgm) * T_scale[0],
-        #           T_zpcl_lgm[1] + (clim_rel - T_climate_lgm) * T_scale[1]]
-        #
-        # delta_T = [(clim_rel - T_climate_pd) * T_scale[0], (clim_rel - T_climate_pd) * T_scale[1]]
-        #
-        # TAa = [(delta_T_lgm[0] - (T_zpcl_lgm[0] - T_zpcl[0])) / delta_T_lgm[0] * (TAa[0] - TAa_pd) + TAa_pd,
-        #        (delta_T_lgm[1] - (T_zpcl_lgm[1] - T_zpcl[1])) / delta_T_lgm[1] * (TAa[1] - TAa_pd) + TAa_pd]
-
         clim = pd.read_excel(climate)
         clim.set_index('year', inplace=True)
         clim_rel = clim.loc[year_end:year_start, 't(C)']  # slicing using loc includes both first and last element
-        clim_rel = clim_rel[
-               ::-1].values  # + 273.16 # reverse order of elements in the array, convert to numpy array
+        clim_rel = clim_rel[::-1].values   # reverse order of elements in the array, convert to numpy array
 
         t_years = year_start - year_end
 
+        T_scale = []
+        T_zpcl = []
+        delta_T = []
+        TAa = []
+
         for i in np.arange(n):
+            T_scale.append(delta_T_lgm[i] / (T_climate_lgm - T_climate_pd))
+            T_zpcl.append(T_zpcl_lgm[i] + (clim_rel - T_climate_lgm) * T_scale[i])
+            delta_T.append((clim_rel - T_climate_pd) * T_scale[i])
+            TAa.append((delta_T_lgm[i] - (T_zpcl_lgm[i] - T_zpcl[i])) / delta_T_lgm[i] * (TAat[i] - TAa_pd) + TAa_pd)
 
-            # THIS NEEDS MODIFICATION
-            T_scale = [delta_T_lgm[0] / (T_climate_lgm - T_climate_pd), delta_T_lgm[1] / (T_climate_lgm - T_climate_pd)]
-            T_zpcl = [T_zpcl_lgm[0] + (clim_rel - T_climate_lgm) * T_scale[0],
-                      T_zpcl_lgm[1] + (clim_rel - T_climate_lgm) * T_scale[1]]
-
-            delta_T = [(clim_rel - T_climate_pd) * T_scale[0], (clim_rel - T_climate_pd) * T_scale[1]]
-
-            TAa = [(delta_T_lgm[0] - (T_zpcl_lgm[0] - T_zpcl[0])) / delta_T_lgm[0] * (TAa[0] - TAa_pd) + TAa_pd,
-                   (delta_T_lgm[1] - (T_zpcl_lgm[1] - T_zpcl[1])) / delta_T_lgm[1] * (TAa[1] - TAa_pd) + TAa_pd]
-
+    print('')
     return clim_rel, T_zpcl, TAa, delta_T, t_years, year_end, year_start
 
 

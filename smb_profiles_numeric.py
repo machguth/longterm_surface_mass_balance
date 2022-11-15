@@ -45,9 +45,6 @@ if __name__=='__main__': # required to use parallel computation under Windows
     Tg = [0.006, 0.006, 0.006, 0.006]  # (K m-1) Temperature lapse rate
     Ts = 1  # (°C) threshold temperature snowfall and rain
 
-    # T_offset = 0  # (K) offset for simulating impact of climate change
-    # p_offset = 0  # (m yr-1) offset for simulating impact of climate change
-
     T_off = [0, 0, 0, 0]  # (K) offset for simulating impact of climate change
     p_off = [0, 0, 0, 0]  # (m yr-1) offset for simulating impact of climate change
 
@@ -79,7 +76,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
 
     # Table of annual air temperature. Comment out to trigger linear run over a duration of "t_years"
     #climate = r'C:/Horst/modeling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'
-    climate = r'E:/_temp_modelling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'
+    climate = r'G:/_temp_modelling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'
 
     # Note that delta_T_lgm, that is MAAT difference between present-day and LGM (coldest) conditions,
     # is not explicitly defined. Instead, it is specified implicitly by chosing values for T_zpcl_pd and
@@ -95,8 +92,6 @@ if __name__=='__main__': # required to use parallel computation under Windows
     year_end = 27000  # (years BP)
 
     # Mean annual air temperature at elevation z_stat and coldest phase (LGM), in Kelvin
-    #T_zpcl_lgm = [270.37, 263.97]  # (K)
-    #T_zpcl_lgm = [270.17, 263.67]  # (K)
     #T_zpcl_lgm = [270.9, 264.65]  # (K)
     #T_zpcl_lgm = [266.9, 266.9]  # (K)
     T_zpcl_lgm = [270.9, 264.65, 266.9, 266.9]  # (K)
@@ -108,7 +103,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
     # ----------------------------------------- Specify hypsometry -------------------------------------------------
     #hypsometry = r'C:/Horst/modeling/modelanalysis/dbdz/s1_hypsometry_mod.xlsx'
     #hypsometry = r'C:/Users/Horst/switchdrive/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod.xlsx'
-    hypsometry = r'E:/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod_v2.xlsx'
+    hypsometry = r'G:/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod_v2.xlsx'
     #hypsometry = r'C:/Horst/modeling/modelanalysis/dbdz/s2_hypsometry.xlsx'
 
     parallel_ts = 100. # (mass balance years) threshold for use of parallel computing (recommended around 100).
@@ -117,7 +112,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
     #outfolder = r'C:/Horst/modeling/modelanalysis/dbdz/'
     #outfolder = r'C:/Users/Horst/switchdrive/_temp_modelling/modeloutput/dbdz/'
     #outfolder = r'C:/Users/machguth/switchdrive/_temp_modelling/modeloutput/test/'
-    outfolder = r'E:/_temp_modelling/modeloutput/SMB_test_27200_27000/'
+    outfolder = r'G:/_temp_modelling/modeloutput/SMB_test_27200_27000/'
     # --------------------------
 
     # #############################################  preparations  ####################################################
@@ -144,24 +139,6 @@ if __name__=='__main__': # required to use parallel computation under Windows
     dem = np.linspace(zmm[0], zmm[1], int((zmm[0] - zmm[1])/step+1))
 
     pddf = np.array(pddf) # convert to numpy array
-
-    # if climate change simulations are done, simply extend some arrays to include four instead of two scenarios
-    # the additional scenarios are identical to the first two, except for the imposed change in climate
-    #if T_offset != 0 or p_offset != 0:
-        # --> T_zpcl = [T_zpcl[0], T_zpcl[1], T_zpcl[0], T_zpcl[1]]
-        #p_a = [p_a[0], p_a[1], p_a[0], p_a[1]]
-        #p_b = [p_b[0], p_b[1], p_b[0], p_b[1]]
-        #psi = [psi[0], psi[1], psi[0], psi[1]]
-        #Tg = [Tg[0], Tg[1], Tg[0], Tg[1]]
-        # --> TAa = [TAa[0], TAa[1], TAa[0], TAa[1]]
-        # --> delta_T = [delta_T[0], delta_T[1], delta_T[0], delta_T[1]]
-        #Tsd = [Tsd[0], Tsd[1], Tsd[0], Tsd[1]]
-        #T_off = [0, 0, T_offset, T_offset]
-        #p_off = [0, 0, p_offset, p_offset]
-
-    #if T_offset == 0 and p_offset == 0:
-        #T_off = [0, 0]
-        #p_off = [0, 0]
 
     # establish an array of temperature at sea level for each of the scenarios
     T0m = [0] * len(T_zpcl)
