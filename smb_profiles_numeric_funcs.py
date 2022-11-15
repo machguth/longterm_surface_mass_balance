@@ -98,7 +98,7 @@ def smb_numerical(dem, t_arr, T0m, Tg, TAa, delta_T, p_a, p_b, psi, Ts, pddf,
 
     pddf = pddf/1000.  # convert PDDFs from mm d-1 °C-1 to m d-1 °C-1
 
-    pdds = np.zeros((9, len(dem), t_years))
+    pdds = np.zeros((11, len(dem), t_years))
 
     year = 0
     year_mb = 0
@@ -108,12 +108,13 @@ def smb_numerical(dem, t_arr, T0m, Tg, TAa, delta_T, p_a, p_b, psi, Ts, pddf,
     snow_1 = np.zeros_like(dem)
     snow_2 = np.zeros_like(dem)
     smin = np.zeros_like(dem)
+    retention_bucket = np.zeros_like(dem)
 
     la = 500  # maximum number of days to be kept in arrays b_arr and bt_arr
-    b_arr = np.zeros((la, len(dem), 7))  # daily array - includes snow, firn, ice, bt, Ttz, PDD_simple, PDD_eff
+    b_arr = np.zeros((la, len(dem), 9))  # daily array: snow, firn, ice, bt, Ttz, PDD_simple, PDD_eff, cum.refreezing
     bt_arr = np.zeros((la, len(dem)))  # array for daily cumulative mass balances
     Ba_arr = np.zeros((len(dem), t_years))  # array for annual mass balance profiles
-    param_arr = np.zeros((16, t_years))  # array for annual and glacier-wide smb parameters
+    param_arr = np.zeros((17, t_years))  # array for annual and glacier-wide smb parameters
     Bm_arr = []  # array for monthly mass balance per grid-cell
     Tm_arr = []  # array for monthly air temperature per grid-cell
 
@@ -155,6 +156,7 @@ def smb_numerical(dem, t_arr, T0m, Tg, TAa, delta_T, p_a, p_b, psi, Ts, pddf,
                 climate_info(T0m[year], TAa[year], Tg, delta_T[year],
                              p_a, p_b, psi, 0, param_arr[4, year_mb], -1, T_off, p_off)
             param_arr[15, year_mb] = TAa[year]
+            param_arr[16, year_mb] = np.mean(r_max)
 
             year_mb += 1
 
@@ -201,6 +203,16 @@ def smb_numerical(dem, t_arr, T0m, Tg, TAa, delta_T, p_a, p_b, psi, Ts, pddf,
         # effective snow melt can't exceed amount of snow
         smelt = np.minimum(snow, pot_smelt)
 
+        # refreezing: calculate how much meltwater is retained
+        retention = np.where((retention_bucket + smelt) < (snow * r_max), smelt, 0)
+        retention = np.where((retention_bucket + smelt) >= (snow * r_max),
+                             (snow * r_max - retention_bucket),
+                             retention)
+
+        # refreezing: (i) adjust snow melt by retention, (ii) update retention bucket
+        smelt -= retention
+        retention_bucket += retention
+
         # firn melt is proportional to excess snow melt
         pot_fmelt = (pot_smelt - smelt) * pddf[1] / pddf[0]
 
@@ -213,6 +225,10 @@ def smb_numerical(dem, t_arr, T0m, Tg, TAa, delta_T, p_a, p_b, psi, Ts, pddf,
         snow -= smelt
         firn -= fmelt
         ice -= imelt
+
+        # refreezing: Update the retention bucket in case of snow melt. The retention bucket can never be larger
+        # than current snow w.e. multiplied with r_max
+        retention_bucket = np.minimum(snow * r_max, retention_bucket)
 
         # daily mass balance of day num
         bt_arr = np.roll(bt_arr, 1, axis=0)
@@ -249,8 +265,8 @@ def smb_numerical(dem, t_arr, T0m, Tg, TAa, delta_T, p_a, p_b, psi, Ts, pddf,
 
         b_arr = np.roll(b_arr, 1, axis=0)
         b_arr[0, :, 0], b_arr[0, :, 1], b_arr[0, :, 2], b_arr[0, :, 3], \
-        b_arr[0, :, 4], b_arr[0, :, 5], b_arr[0, :, 6] = snow, \
-                   firn, ice, btc, Ttz, (Ttz > 0.) * Ttz, Ttz_eff
+        b_arr[0, :, 4], b_arr[0, :, 5], b_arr[0, :, 6], b_arr[0, :, 7], b_arr[0, :, 8] = snow, \
+                   firn, ice, btc, Ttz, (Ttz > 0.) * Ttz, Ttz_eff, retention, r_max
 
         if (day_abs / 3650000 == np.floor(day_abs / 3650000)):
             print('Calculated ' + str(int(year)) + ' years.')
@@ -308,6 +324,8 @@ def smb_param_dem(t_arr_jul, b_arr, dem, df_hypso):
     B = b_arr_yr[0, :, 3] - b_arr_yr[-1, :, 3]  # use difference between first and last day of the last 365 days
     maxT = np.amax(b_arr_yr[:, :, 4], axis=0)
     minT = np.amin(b_arr_yr[:, :, 4], axis=0)
+    retention = np.sum(b_arr_yr[:, :, 7], axis=0)
+    r_max = np.mean(b_arr_yr[:, :, 8], axis=0)
     start_abl = np.zeros_like(dem)
     end_abl = np.zeros_like(dem)
     dur_abl = np.zeros_like(dem)
@@ -321,7 +339,7 @@ def smb_param_dem(t_arr_jul, b_arr, dem, df_hypso):
 
     BB = B * df_hypso['area'] * 10 ** 6
 
-    pdds = [start_abl, end_abl, dur_abl, maxT, minT, pdd_sum, pdd_sum_eff, B, BB]
+    pdds = [start_abl, end_abl, dur_abl, maxT, minT, pdd_sum, pdd_sum_eff, B, BB, retention, r_max]
 
     return pdds
 

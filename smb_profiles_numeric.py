@@ -147,7 +147,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
 
     df_out = pd.DataFrame(columns=['z (m a.s.l.)', 'A (km2)', 's_Tpos (jul.d)', 'e_Tpos (jul.d)', 'dur_Tpos (d)',
                                    'Tmax (°C)', 'Tmin (°C)', 'pdd (°C d)', 'pdd_eff (°C d)',
-                                   'b (m.w.e)', 'Ba (m3 w.e.)'])
+                                   'b (m w.e)', 'Ba (m3 w.e.)', 'Retention (m w.e.)', 'r_max ()'])
 
     df_out['z (m a.s.l.)'] = dem
     df_out['A (km2)'] = df_hypso['area']
@@ -160,10 +160,10 @@ if __name__=='__main__': # required to use parallel computation under Windows
     # set up a few output arrays
     t_arr = np.arange(t_start, t_years*365+t_start)
     Ba = np.zeros((len(T_zpcl), len(dem), t_years))
-    param_arr = np.zeros((len(T_zpcl), 16, t_years))
+    param_arr = np.zeros((len(T_zpcl), 17, t_years))
     Bm = [] # table of monthly mass balance at all grid cells
     Tm = [] # table of monthly air temperature at all grid cells
-    pdds = np.zeros((len(T_zpcl), 10, len(dem), t_years))
+    pdds = np.zeros((len(T_zpcl), 12, len(dem), t_years))
     clim_info = np.zeros((len(T_zpcl), 4))
     for ind, i in enumerate(T_zpcl):
         pdds[ind, 0, :, 0] = dem

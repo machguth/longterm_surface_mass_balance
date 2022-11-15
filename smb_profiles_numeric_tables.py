@@ -21,7 +21,7 @@ import pandas as pd
 def write_output_table_xls1(outfolder, T_zpcl, df_out, pdds):
     with pd.ExcelWriter(outfolder + 'out_table_num.xlsx') as writer:
         for ind, i in enumerate(T_zpcl):
-            for i2 in range(2, 11):
+            for i2 in range(2, 13):
                 df_out.iloc[:, i2] = pdds[ind, i2 - 1]
                 df_out.iloc[:, i2] = pdds[ind, i2 - 1]
             df_out.to_excel(writer, sheet_name='Scenario_' + str(ind + 1))
@@ -31,12 +31,12 @@ def write_output_table_xls1(outfolder, T_zpcl, df_out, pdds):
 # write output table nr. 2 (as XLSX)
 def write_output_table_xls2(outfolder, param_arr, T_raw, T_zpcl, year_start, year_end, mb_years):
     with pd.ExcelWriter(outfolder + 'out_table_annual_parameters_yrs_' +
-                            str(int(year_start))+'-'+str(int(year_end))+'.xlsx') as writer:
+                        str(int(year_start))+'-'+str(int(year_end))+'.xlsx') as writer:
         df_out = pd.DataFrame(columns=['year', 'B (m w.e.)', 'B_max (m w.e.)', 'B_min (m w.e.)', 'db/dz (m (100 m)-1 yr-1)',
                                        'ELA (m a.s.l.)', 'AAR (-)', 'B_acc (GT)', 'T_GISP_raw (C)', 'MAAT@400 m asl.(°C)',
                                        'Tjuly@400 m asl.(°C)', 'Tjan@400 m asl.(°C)', 'P@400 m asl.(m yr-1)',
                                        'MAAT@ELA (°C)', 'Tjuly@ELA (°C)',
-                                       'Tjan@ELA (°C)', 'P@ELA (m yr-1)', 'T_amplitude (K)'])
+                                       'Tjan@ELA (°C)', 'P@ELA (m yr-1)', 'T_amplitude (K)', 'mean_of_r_max ()'])
 
         years = np.arange(year_end, year_start, 1)
         years = years[::-1]  # reverse array
