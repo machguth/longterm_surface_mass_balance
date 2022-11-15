@@ -98,7 +98,7 @@ def smb_numerical(dem, t_arr, T0m, Tg, TAa, delta_T, p_a, p_b, psi, Ts, pddf,
 
     pddf = pddf/1000.  # convert PDDFs from mm d-1 °C-1 to m d-1 °C-1
 
-    pdds = np.zeros((11, len(dem), t_years))
+    pdds = np.zeros((12, len(dem), t_years))
 
     year = 0
     year_mb = 0
@@ -109,9 +109,10 @@ def smb_numerical(dem, t_arr, T0m, Tg, TAa, delta_T, p_a, p_b, psi, Ts, pddf,
     snow_2 = np.zeros_like(dem)
     smin = np.zeros_like(dem)
     retention_bucket = np.zeros_like(dem)
+    rho_firn = np.full_like(dem, np.nan)
 
     la = 500  # maximum number of days to be kept in arrays b_arr and bt_arr
-    b_arr = np.zeros((la, len(dem), 9))  # daily array: snow, firn, ice, bt, Ttz, PDD_simple, PDD_eff, cum.refreezing
+    b_arr = np.zeros((la, len(dem), 10))  # daily array: snow, firn, ice, bt, Ttz, PDD_simple, PDD_eff, cum.refreezing
     bt_arr = np.zeros((la, len(dem)))  # array for daily cumulative mass balances
     Ba_arr = np.zeros((len(dem), t_years))  # array for annual mass balance profiles
     param_arr = np.zeros((17, t_years))  # array for annual and glacier-wide smb parameters
@@ -130,7 +131,7 @@ def smb_numerical(dem, t_arr, T0m, Tg, TAa, delta_T, p_a, p_b, psi, Ts, pddf,
         t_arr_jul[0] = day
 
         if num == 0:  # initialize refreezing
-            r_max = refreezing(refreeze, refreeze_parameterization, num, T0m, Tg, dem)
+            r_max, rho_firn = refreezing(refreeze, refreeze_parameterization, year, num, T0m, Tg, dem, rho_firn)
 
         mn = np.where(months[0,:] == day)
         if len(mn[0]) == 1 and num > 31:  # test if a month has just ended (and if enough total days have passed)
@@ -139,7 +140,8 @@ def smb_numerical(dem, t_arr, T0m, Tg, TAa, delta_T, p_a, p_b, psi, Ts, pddf,
 
         if day_abs/365 == np.floor(day_abs/365):  # To be carried out every end of a year
             year += 1
-            r_max = refreezing(refreeze, refreeze_parameterization, num, T0m, Tg, dem)  # update refreezing
+            # update refreezing
+            r_max, rho_firn = refreezing(refreeze, refreeze_parameterization, year, num, T0m, Tg, dem, rho_firn)
 
         if day_abs/365 == np.floor(day_abs/365) and num > 365:  # only to be executed after a full year has passed
             Ba_arr[:, year_mb] = b_arr[0, :, 3] - b_arr[364, :, 3]  # diff. between 1. and last day of the last 365 days
@@ -214,7 +216,9 @@ def smb_numerical(dem, t_arr, T0m, Tg, TAa, delta_T, p_a, p_b, psi, Ts, pddf,
         retention_bucket += retention
 
         # firn melt is proportional to excess snow melt
-        pot_fmelt = (pot_smelt - smelt) * pddf[1] / pddf[0]
+        # Important to here subtract 'retention', therwise mechanism fails if retentioon > 0:
+        # firn and ice would be melted bcs. (pot_smelt - smelt) > 0 if retentioon > 0
+        pot_fmelt = (pot_smelt - retention - smelt) * pddf[1] / pddf[0]
 
         # effective firn melt can't exceed amount of firn
         fmelt = np.minimum(firn, pot_fmelt)
@@ -265,8 +269,9 @@ def smb_numerical(dem, t_arr, T0m, Tg, TAa, delta_T, p_a, p_b, psi, Ts, pddf,
 
         b_arr = np.roll(b_arr, 1, axis=0)
         b_arr[0, :, 0], b_arr[0, :, 1], b_arr[0, :, 2], b_arr[0, :, 3], \
-        b_arr[0, :, 4], b_arr[0, :, 5], b_arr[0, :, 6], b_arr[0, :, 7], b_arr[0, :, 8] = snow, \
-                   firn, ice, btc, Ttz, (Ttz > 0.) * Ttz, Ttz_eff, retention, r_max
+        b_arr[0, :, 4], b_arr[0, :, 5], b_arr[0, :, 6], b_arr[0, :, 7], \
+        b_arr[0, :, 8], b_arr[0, :, 9] = snow, \
+                   firn, ice, btc, Ttz, (Ttz > 0.) * Ttz, Ttz_eff, retention, r_max, rho_firn
 
         if (day_abs / 3650000 == np.floor(day_abs / 3650000)):
             print('Calculated ' + str(int(year)) + ' years.')
@@ -326,6 +331,7 @@ def smb_param_dem(t_arr_jul, b_arr, dem, df_hypso):
     minT = np.amin(b_arr_yr[:, :, 4], axis=0)
     retention = np.sum(b_arr_yr[:, :, 7], axis=0)
     r_max = np.mean(b_arr_yr[:, :, 8], axis=0)
+    rho_firn = np.mean(b_arr_yr[:, :, 9], axis=0)
     start_abl = np.zeros_like(dem)
     end_abl = np.zeros_like(dem)
     dur_abl = np.zeros_like(dem)
@@ -339,7 +345,7 @@ def smb_param_dem(t_arr_jul, b_arr, dem, df_hypso):
 
     BB = B * df_hypso['area'] * 10 ** 6
 
-    pdds = [start_abl, end_abl, dur_abl, maxT, minT, pdd_sum, pdd_sum_eff, B, BB, retention, r_max]
+    pdds = [start_abl, end_abl, dur_abl, maxT, minT, pdd_sum, pdd_sum_eff, B, BB, retention, r_max, rho_firn]
 
     return pdds
 
@@ -374,7 +380,7 @@ def smb_param_glacier_wide(B, dem, df_hypso, step):
 
 # ******************************************************************************************************************
 # calculate refreezing
-def refreezing(refreeze, refreeze_parameterization, num, T0m, Tg, dem):
+def refreezing(refreeze, refreeze_parameterization, year, num, T0m, Tg, dem, rho_firn):
 
     """ This module calculates the retention factor Cmax (see Reeh, 1991). Cmax is either (i) assumed 0.6 according
     to Reeh (1991) or (ii) is calculated as a function of firn temperature according to Pfeffer et al. (1991) and with
@@ -397,6 +403,7 @@ def refreezing(refreeze, refreeze_parameterization, num, T0m, Tg, dem):
         Ci = 1950  # [J K-1 kg-1] volumetric heat capacity ice at approx. -5°C
         rho_pc = 0.83  # [kg dm-3]  Porel close-off density
 
+
         # *************************************** start of model run ***************************************************
         # Here the initial retention fraction is defined. Is simply set to 0 as already
         # beginning next year a retention fraction is defined based on either a fixed value (Reeh_1991) or
@@ -414,11 +421,11 @@ def refreezing(refreeze, refreeze_parameterization, num, T0m, Tg, dem):
         if num > 0:  # do in all other cases. Note that r_max is calculated only every end of a year
 
             # fixed fraction of the water equivalent of the snow cover can be refrozen
-            if refreeze_parameterization == 'Reeh_1991':
+            if refreeze_parameterization == 'Reeh91':
                 r_max = retention_reeh91 + dem * 0
 
             # refreezing potential depends on firn T and firn rho. firn density calculation from Reeh et al. (2005)
-            if refreeze_parameterization == 'Pfeffer_1991+Reeh_2005':
+            if refreeze_parameterization == 'Pfeffer91-Reeh05':
                 # determine the relevant values
                 ann_mean_T = T0m[year] - dem * Tg  # Ta, in "year", along DEM axis
                 # Following Reeh et al. (2005): calculate firn density and convert from kg m-3 to kg dm-1
@@ -428,13 +435,7 @@ def refreezing(refreeze, refreeze_parameterization, num, T0m, Tg, dem):
                                 (1 + ((rho_pc - rho_firn) / rho_firn))**(-1.)
                 r_max = np.where(r_max < 0, 0, r_max)
 
-            print('======================================================')
-            print('mean ann_mean_T:           ', np.mean(ann_mean_T))
-            print('mean rho_firn:             ', np.mean(rho_firn))
-            print('mean r_max:        ', np.mean(r_max))
-            print('======================================================')
-
     else:
         r_max = dem * 0  # array of zeros
 
-    return r_max
+    return r_max, rho_firn * 1000  # convert firn density back to kg m-3

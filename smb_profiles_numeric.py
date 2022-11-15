@@ -39,19 +39,15 @@ if __name__=='__main__': # required to use parallel computation under Windows
     #TAa = [8.75, 15]  # (K) Air temperature, annual amplitude, LGM conditions
     TAa = [8.75, 15, 15, 15]  # (K) Air temperature, annual amplitude, LGM conditions
     #TAa = [15, 15]  # (K) Air temperature, annual amplitude, LGM conditions
-    #Tsd = [3.5, 3.5]  # (K) Standard deviation daily air temperature ==> set to zero to suppress daily cycle of T
-    Tsd = [3.5, 3.5, 3.5, 3.5]  # (K) Standard deviation daily air temperature ==> set to zero to suppress daily cycle of T
-    #Tg = [0.006, 0.006]  # (K m-1) Temperature lapse rate
-    Tg = [0.006, 0.006, 0.006, 0.006]  # (K m-1) Temperature lapse rate
+    Tsd = [3.5] * 4  # (K) Standard deviation daily air temperature ==> set to zero to suppress daily cycle of T
+    Tg = [0.006] * 4  # (K m-1) Temperature lapse rate
     Ts = 1  # (°C) threshold temperature snowfall and rain
 
-    T_off = [0, 0, 0, 0]  # (K) offset for simulating impact of climate change
-    p_off = [0, 0, 0, 0]  # (m yr-1) offset for simulating impact of climate change
+    T_off = [0] * 4  # (K) offset for simulating impact of climate change
+    p_off = [0] * 4 # (m yr-1) offset for simulating impact of climate change
 
-    #p_a = [0.0002857, 0.0002857]  # () factor a in: p = a*z + b, where z is elevation and p is present-day annual precip
-    p_a = [0.0002857, 0.0002857, 0.0002857, 0.0002857]  # () factor a in: p = a*z + b, where z is elevation and p is present-day annual precip
-    #p_b = [1.1412, 1.1412]  # (m) factor b in: p = a*z + b, where z is elevation and p is present-day annual precip
-    p_b = [1.1412, 1.1412, 1.1412, 1.1412]  # (m) factor b in: p = a*z + b, where z is elevation and p is present-day annual precip
+    p_a = [0.0002857] * 4 # () factor a in: p = a*z + b, where z is elevation and p is present-day annual precip
+    p_b = [1.1412] * 4 # (m) factor b in: p = a*z + b, where z is elevation and p is present-day annual precip
     #psi = [0.0704, 0.0704]  # () psi in: p_scale = exp(psi * delta_T_lgm), Huybrechts (2002); set 0 for p_scale = 1.
     #psi = [0.0704, 0.028]  # () psi in: p_scale = exp(psi * delta_T_lgm), Huybrechts (2002); set 0 for p_scale = 1.
     psi = [0.0704, 0.0704, 0.0704, 0.028]  # () psi in: p_scale = exp(psi * delta_T_lgm), Huybrechts (2002); set 0 for p_scale = 1.
@@ -59,14 +55,12 @@ if __name__=='__main__': # required to use parallel computation under Windows
     # Calculating refreezing of meltwater. Two parameterizations can be used, either 'Reeh91' or 'Pfeffer91-Reeh05'
     # 'Reeh91' uses fixed fraction of snow w.e. to calculate amount of meltwater that refreezes before runoff starts
     # 'Pfeffer91-Reeh05' calculates fraction of snow w.e. based on firn T (using MAAT)
-    #refreeze = [False, False]  # specify whether refreezing of meltwater is simulated
-    refreeze = [False, False, False, False]  # specify whether refreezing of meltwater is simulated
-    #refreeze_parameterization = ['Reeh91', 'Reeh91']  # parameterization to be used
-    refreeze_parameterization = ['Reeh91', 'Reeh91', 'Reeh91', 'Reeh91']  # parameterization to be used
+    refreeze = [False] * 4 # specify whether refreezing of meltwater is simulated
+    # refreeze_parameterization = ['Reeh91'] * 4 # parameterization to be used
+    refreeze_parameterization = ['Pfeffer91-Reeh05'] * 4 # parameterization to be used
 
     pddf = [3.297, 6, 8.791]  # (mm K-1 d-1) degree day factors, first for snow, second for firn, third for ice
 
-    #zmm = [3150, 350]  # (m a.s.l.) max and min elevation z for calculation, identical to "hypsometry"
     zmm = [3250, 50]    # (m a.s.l.) max and min elevation z for calculation, identical to "hypsometry"
     step = 100          # (m) elevation step for calculation of B, identical to "hypsometry"
 
@@ -112,7 +106,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
     #outfolder = r'C:/Horst/modeling/modelanalysis/dbdz/'
     #outfolder = r'C:/Users/Horst/switchdrive/_temp_modelling/modeloutput/dbdz/'
     #outfolder = r'C:/Users/machguth/switchdrive/_temp_modelling/modeloutput/test/'
-    outfolder = r'G:/_temp_modelling/modeloutput/SMB_test_27200_27000/'
+    outfolder = r'G:/_temp_modelling/modeloutput/SMB_test_27200_27000_norefreeze/'
     # --------------------------
 
     # #############################################  preparations  ####################################################
@@ -147,7 +141,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
 
     df_out = pd.DataFrame(columns=['z (m a.s.l.)', 'A (km2)', 's_Tpos (jul.d)', 'e_Tpos (jul.d)', 'dur_Tpos (d)',
                                    'Tmax (°C)', 'Tmin (°C)', 'pdd (°C d)', 'pdd_eff (°C d)',
-                                   'b (m w.e)', 'Ba (m3 w.e.)', 'Retention (m w.e.)', 'r_max ()'])
+                                   'b (m w.e)', 'Ba (m3 w.e.)', 'Retention (m w.e.)', 'r_max ()', 'rho_firn (kg m-3)'])
 
     df_out['z (m a.s.l.)'] = dem
     df_out['A (km2)'] = df_hypso['area']
@@ -163,7 +157,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
     param_arr = np.zeros((len(T_zpcl), 17, t_years))
     Bm = [] # table of monthly mass balance at all grid cells
     Tm = [] # table of monthly air temperature at all grid cells
-    pdds = np.zeros((len(T_zpcl), 12, len(dem), t_years))
+    pdds = np.zeros((len(T_zpcl), 13, len(dem), t_years))
     clim_info = np.zeros((len(T_zpcl), 4))
     for ind, i in enumerate(T_zpcl):
         pdds[ind, 0, :, 0] = dem
