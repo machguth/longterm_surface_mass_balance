@@ -94,15 +94,16 @@ def plot_fig_3(clim_info, TAa, Tsd, T_zpcl, Tg, p_a, pddf, T_off, p_off,
 
     p_a = np.array(p_a)*1000
 
-    specifier = 'Taa{:.2f}'.format(TAa[0][0]) + ' {:.2f}'.format(TAa[1][0]) + '__T{:.2f}'.format(
-                clim_info[0, 0]) + ' {:.2f}'.format(clim_info[1, 0]) + '__Tsd{:.2f}'.format(
-                Tsd[0]) + ' {:.2f}'.format(Tsd[1]) \
-                + '__P{:.3f}'.format(clim_info[0, 3]) + ' {:.3f}'.format(clim_info[1, 3]) + '__Tg{:.2f}'.format(
-                Tg[0] * 1000) + ' {:2f}'.format(Tg[1]) + '__Pg{:}'.format(p_a[0]) \
-                + ' {:}'.format(p_a[1]) + '__PDD{:.1f}'.format(pddf[0]) + ' {:.1f}'.format(
-                pddf[1]) # + '__T_offset{:.1f}'.format(T_offset) + '__p_offset{:.2f}'.format(p_offset)
+    # specifier = 'Taa{:.2f}'.format(TAa[0][0]) + ' {:.2f}'.format(TAa[1][0]) + '__T{:.2f}'.format(
+    #             clim_info[0, 0]) + ' {:.2f}'.format(clim_info[1, 0]) + '__Tsd{:.2f}'.format(
+    #             Tsd[0]) + ' {:.2f}'.format(Tsd[1]) \
+    #             + '__P{:.3f}'.format(clim_info[0, 3]) + ' {:.3f}'.format(clim_info[1, 3]) + '__Tg{:.2f}'.format(
+    #             Tg[0] * 1000) + ' {:2f}'.format(Tg[1]) + '__Pg{:}'.format(p_a[0]) \
+    #             + ' {:}'.format(p_a[1]) + '__PDD{:.1f}'.format(pddf[0]) + ' {:.1f}'.format(
+    #             pddf[1])
+    # out_fig = outfolder + 'smb_prof_num_'+specifier+'.pdf'
 
-    out_fig = outfolder + 'smb_prof_num_'+specifier+'.pdf'
+    out_fig = outfolder + 'smb_profile.pdf'
 
     # Create figure and axes
     fig = plt.figure(figsize=[9, 5])
@@ -114,12 +115,6 @@ def plot_fig_3(clim_info, TAa, Tsd, T_zpcl, Tg, p_a, pddf, T_off, p_off,
     # get range of X-axis
     maxB = math.ceil(np.amax(maxB) / 2) * 2  # get axis range
     minB = math.floor(np.amin(minB) / 2) * 2  # get axis range
-
-    # # define the axes
-    # if maxB - minB < 6:
-    #     smb_axis = np.linspace(maxB, minB, int((maxB - minB)/0.25 + 1))
-    # else:
-    #     smb_axis = np.linspace(maxB, minB, int((maxB - minB) / 0.5 + 1))
 
     # Define major and minor ticks
     ymajor_ticks = np.arange(np.ceil(zmm[1] / maty) * maty, zmm[0] + 1, maty)
@@ -133,8 +128,8 @@ def plot_fig_3(clim_info, TAa, Tsd, T_zpcl, Tg, p_a, pddf, T_off, p_off,
     ax1.set_yticks(ymajor_ticks)
     ax1.set_yticks(yminor_ticks, minor=True)
 
-    ax1.grid(which='minor', color='k', linewidth=0.2, linestyle='dotted', zorder=0)
-    ax1.grid(which='major', color='k', linewidth=0.2, linestyle='dotted', zorder=0)
+    #ax1.grid(which='minor', color='k', linewidth=0.2, linestyle='dotted', zorder=0)
+    ax1.grid(which='major', color='k', linewidth=0.2, linestyle='dashed', zorder=0, alpha= 0.1)
 
     # make vertical zero line
     ax1.plot([0, 0], [zmm[1], zmm[0]], color='k', linewidth=0.8)
@@ -157,19 +152,14 @@ def plot_fig_3(clim_info, TAa, Tsd, T_zpcl, Tg, p_a, pddf, T_off, p_off,
 
     # *** Secondd plot: plot the delta b
     ax3.plot(B[1] - B[0], dem, color='black', linewidth=1.0, linestyle='dashed')
-    # if T_offset != 0 or p_offset != 0:
-    #     ax3.plot(B[2] - B[0], dem, color='r', linewidth=1.0, linestyle='dotted')
-    #     ax3.plot(B[3] - B[1], dem, color='b', linewidth=1.0, linestyle='dotted')
-    # else:
-    #     ax3.plot(B[1] - B[0], dem, color='black', linewidth=1.0, linestyle='dashed')
 
     ax3.set_ylim([zmm[1], zmm[0]])
     ax3.set_yticks(ymajor_ticks)
     ax3.set_yticks(yminor_ticks, minor=True)
     minorLocator3 = AutoMinorLocator()
     ax3.xaxis.set_minor_locator(minorLocator3)
-    ax3.xaxis.grid(which='minor', color='k', linewidth=0.2, linestyle='dotted', zorder=0)
-    ax3.xaxis.grid(which='major', color='k', linewidth=0.2, linestyle='dotted', zorder=0)
+    ax3.xaxis.grid(which='minor', color='k', linewidth=0.2, linestyle='dotted', zorder=0, alpha= 0.1)
+    ax3.xaxis.grid(which='major', color='k', linewidth=0.2, linestyle='dotted', zorder=0, alpha= 0.1)
 
     # *** First plot: create and place legend
     yTop = zmm[0] - (zmm[0]-zmm[1])/20
@@ -192,116 +182,92 @@ def plot_fig_3(clim_info, TAa, Tsd, T_zpcl, Tg, p_a, pddf, T_off, p_off,
                      r' | ELA: {:} m a.s.l.'.format(int(ELA[ind])),
                      fontdict=fonts[2], size=6)  # (100 m)$^{-1}$
 
-    # if T_offset != 0 or p_offset != 0:
-    #     TOffStr = str(T_offset)
-    #     pOffStr = str(p_offset)
-    #     yi = yTop - (ind + 1) * yShift / 1.3
-    #     ax1.plot([xLeft, xLeft + xShift], [yi, yi], color='r', linewidth=1.0, linestyle='dotted')
-    #     yi = yTop - (ind+2)*yShift/1.3
-    #     ax1.plot([xLeft, xLeft + xShift], [yi, yi], color='b', linewidth=1.0, linestyle='dotted')
-    #     ax1.text(xLeft + xShift + xShift/5, yi + yShift / 5,
-    #              r'}', fontdict=fonts[2], size=12)
-    #     ax1.text(xLeft + 2 * xShift, yi + yShift / 4,
-    #              r'$\Delta b$ (m w.e.) for $T_{offset}$=' + TOffStr + r' K, $p_{offset}$=' + pOffStr + r' m yr$^{-1}$',
-    #              fontdict=fonts[2], size=6)
-
     # now plot all the information on the applied variable combinations
     # for better readability first only the variable names and units
-    ax1.text(xLeft, yTop - (ind + 2.0) * yShift, r'$T_A$ (K): ',
-             fontdict=fonts[2], size=6)
-    ax1.text(xLeft, yTop - (ind + 2.7) * yShift, r'$\sigma_{daily}$ (K): ',
-             fontdict=fonts[2], size=6)
-    ax1.text(xLeft, yTop - (ind + 3.4) * yShift, r'$MAAT$ (K) @{:}'.format(z_paleoclim) +
-             ' m a.s.l.:', fontdict=fonts[2], size=6)
-    ax1.text(xLeft, yTop - (ind + 4.1) * yShift, r'$P$ (m yr$^{-1}$) ' + r'@{:}'.format(z_paleoclim) +
-             ' m a.s.l.:', fontdict=fonts[2], size=6)
-    # ax1.text(xLeft, yTop - (ind+4.1)*yShift, r'$P$ (m yr$^{-1}$): ', fontdict=fonts[2], size=6)
-    ax1.text(xLeft, yTop - (ind + 4.8) * yShift, r'$\gamma_{T}$ (K km$^{-1}$): ',
-             fontdict=fonts[2], size=6)
-    ax1.text(xLeft, yTop - (ind + 5.5) * yShift, r'$\gamma_{P}$ ((1000 m)$^{-1}$ yr$^{-1}$): ',
-             fontdict=fonts[2], size=6)
-    ax1.text(xLeft, yTop - (ind + 6.2) * yShift, r'PDDF$_{snow}$ (mm K$^{-1}$ d$^{-1}$): ',
-             fontdict=fonts[2], size=6)
-    ax1.text(xLeft, yTop - (ind + 6.9) * yShift, r'PDDF$_{ice}$ (mm K$^{-1}$ d$^{-1}$): ',
-             fontdict=fonts[2], size=6)
+    # ax1.text(xLeft, yTop - (ind + 2.0) * yShift, r'$T_A$ (K): ',
+    #          fontdict=fonts[2], size=6)
+    # ax1.text(xLeft, yTop - (ind + 2.7) * yShift, r'$\sigma_{daily}$ (K): ',
+    #          fontdict=fonts[2], size=6)
+    # ax1.text(xLeft, yTop - (ind + 3.4) * yShift, r'$MAAT$ (K) @{:}'.format(z_paleoclim) +
+    #          ' m a.s.l.:', fontdict=fonts[2], size=6)
+    # ax1.text(xLeft, yTop - (ind + 4.1) * yShift, r'$P$ (m yr$^{-1}$) ' + r'@{:}'.format(z_paleoclim) +
+    #          ' m a.s.l.:', fontdict=fonts[2], size=6)
+    # # ax1.text(xLeft, yTop - (ind+4.1)*yShift, r'$P$ (m yr$^{-1}$): ', fontdict=fonts[2], size=6)
+    # ax1.text(xLeft, yTop - (ind + 4.8) * yShift, r'$\gamma_{T}$ (K km$^{-1}$): ',
+    #          fontdict=fonts[2], size=6)
+    # ax1.text(xLeft, yTop - (ind + 5.5) * yShift, r'$\gamma_{P}$ ((1000 m)$^{-1}$ yr$^{-1}$): ',
+    #          fontdict=fonts[2], size=6)
+    # ax1.text(xLeft, yTop - (ind + 6.2) * yShift, r'PDDF$_{snow}$ (mm K$^{-1}$ d$^{-1}$): ',
+    #          fontdict=fonts[2], size=6)
+    # ax1.text(xLeft, yTop - (ind + 6.9) * yShift, r'PDDF$_{ice}$ (mm K$^{-1}$ d$^{-1}$): ',
+    #          fontdict=fonts[2], size=6)
 
-    dv = 8.3
+    dv = 3.3
     fs = 5
 
     # then plot the values, thereby plotting a value only once if identical for both cases
-    if TAa[0][0] == TAa[1][0]:
-        ax1.text(xLeft + dv * xShift, yTop - (ind + 2.0) * yShift, '{:.2f}'.format(TAa[0][0]),
-                 fontdict=fonts[2], size=fs)
-    else:
-        ax1.text(xLeft+dv*xShift, yTop - (ind+2.0)*yShift, '{:.2f}'.format(TAa[0][0]) + '; ' +
-                 '{:.2f}'.format(TAa[1][0]), fontdict=fonts[2], size=fs)
-    if Tsd[0] == Tsd[1]:
-        ax1.text(xLeft + dv * xShift, yTop - (ind + 2.7) * yShift, '{:}'.format(Tsd[0]),
-                 fontdict=fonts[2], size=fs)
-    else:
-        ax1.text(xLeft+dv*xShift, yTop - (ind+2.7)*yShift, '{:}'.format(Tsd[0])+'; '+'{:}'.format(Tsd[1]),
-                 fontdict=fonts[2], size=fs)
-    if clim_info[0, 0] == clim_info[1, 0]:
-        ax1.text(xLeft + dv * xShift, yTop - (ind + 3.4) * yShift, '{:.2f}'.format(clim_info[0, 0]),
-                 fontdict=fonts[2], size=fs)
-    else:
-        ax1.text(xLeft + dv * xShift, yTop - (ind+3.4) * yShift, '{:.2f}'.format(clim_info[0, 0]) +
-                 '; ' + '{:.2f}'.format(clim_info[1, 0]), fontdict=fonts[2], size=fs)
-    if clim_info[0, 3] == clim_info[1, 3]:
-        ax1.text(xLeft + dv * xShift, yTop - (ind + 4.1) * yShift, '{:.3f}'.format(clim_info[0, 3]),
-                 fontdict=fonts[2], size=fs)
-    else:
-        ax1.text(xLeft+dv*xShift, yTop - (ind+4.1)*yShift, '{:.3f}'.format(clim_info[0, 3]) +
-                 '; ' + '{:.3f}'.format(clim_info[1, 3]), fontdict=fonts[2], size=fs)
-    if Tg[0] == Tg[1]:
-        ax1.text(xLeft+dv*xShift, yTop - (ind+4.8)*yShift, '{:.2f}'.format(Tg[0]*1000),
-                 fontdict=fonts[2], size=fs)
-    else:
-        ax1.text(xLeft + dv * xShift, yTop - (ind + 4.8) * yShift, '{:.2f}'.format(Tg[0] * 1000) +
-                 '; ' + '{:.2f}'.format(Tg[1]), fontdict=fonts[2], size=fs)
-    if p_a[0] == p_a[1]:
-        ax1.text(xLeft + dv * xShift, yTop - (ind + 5.5) * yShift, '{:}'.format(p_a[0]),
-                 fontdict=fonts[2], size=fs)
-    else:
-        ax1.text(xLeft+dv*xShift, yTop - (ind+5.5)*yShift, '{:}'.format(p_a[0]) +
-                 '; ' + '{:}'.format(p_a[1]), fontdict=fonts[2], size=fs)
-    ax1.text(xLeft+dv*xShift, yTop - (ind+6.2)*yShift, '{:.1f}'.format(pddf[0]),
-             fontdict=fonts[2], size=fs)
-    ax1.text(xLeft+dv*xShift, yTop - (ind+6.9)*yShift, '{:.1f}'.format(pddf[2]),
-             fontdict=fonts[2], size=fs)
+    # if TAa[0][0] == TAa[1][0]:
+    #     ax1.text(xLeft + dv * xShift, yTop - (ind + 2.0) * yShift, '{:.2f}'.format(TAa[0][0]),
+    #              fontdict=fonts[2], size=fs)
+    # else:
+    #     ax1.text(xLeft+dv*xShift, yTop - (ind+2.0)*yShift, '{:.2f}'.format(TAa[0][0]) + '; ' +
+    #              '{:.2f}'.format(TAa[1][0]), fontdict=fonts[2], size=fs)
+    # if Tsd[0] == Tsd[1]:
+    #     ax1.text(xLeft + dv * xShift, yTop - (ind + 2.7) * yShift, '{:}'.format(Tsd[0]),
+    #              fontdict=fonts[2], size=fs)
+    # else:
+    #     ax1.text(xLeft+dv*xShift, yTop - (ind+2.7)*yShift, '{:}'.format(Tsd[0])+'; '+'{:}'.format(Tsd[1]),
+    #              fontdict=fonts[2], size=fs)
+    # if clim_info[0, 0] == clim_info[1, 0]:
+    #     ax1.text(xLeft + dv * xShift, yTop - (ind + 3.4) * yShift, '{:.2f}'.format(clim_info[0, 0]),
+    #              fontdict=fonts[2], size=fs)
+    # else:
+    #     ax1.text(xLeft + dv * xShift, yTop - (ind+3.4) * yShift, '{:.2f}'.format(clim_info[0, 0]) +
+    #              '; ' + '{:.2f}'.format(clim_info[1, 0]), fontdict=fonts[2], size=fs)
+    # if clim_info[0, 3] == clim_info[1, 3]:
+    #     ax1.text(xLeft + dv * xShift, yTop - (ind + 4.1) * yShift, '{:.3f}'.format(clim_info[0, 3]),
+    #              fontdict=fonts[2], size=fs)
+    # else:
+    #     ax1.text(xLeft+dv*xShift, yTop - (ind+4.1)*yShift, '{:.3f}'.format(clim_info[0, 3]) +
+    #              '; ' + '{:.3f}'.format(clim_info[1, 3]), fontdict=fonts[2], size=fs)
+    # if Tg[0] == Tg[1]:
+    #     ax1.text(xLeft+dv*xShift, yTop - (ind+4.8)*yShift, '{:.2f}'.format(Tg[0]*1000),
+    #              fontdict=fonts[2], size=fs)
+    # else:
+    #     ax1.text(xLeft + dv * xShift, yTop - (ind + 4.8) * yShift, '{:.2f}'.format(Tg[0] * 1000) +
+    #              '; ' + '{:.2f}'.format(Tg[1]), fontdict=fonts[2], size=fs)
+    # if p_a[0] == p_a[1]:
+    #     ax1.text(xLeft + dv * xShift, yTop - (ind + 5.5) * yShift, '{:}'.format(p_a[0]),
+    #              fontdict=fonts[2], size=fs)
+    # else:
+    #     ax1.text(xLeft+dv*xShift, yTop - (ind+5.5)*yShift, '{:}'.format(p_a[0]) +
+    #              '; ' + '{:}'.format(p_a[1]), fontdict=fonts[2], size=fs)
+    # ax1.text(xLeft+dv*xShift, yTop - (ind+6.2)*yShift, '{:.1f}'.format(pddf[0]),
+    #          fontdict=fonts[2], size=fs)
+    # ax1.text(xLeft+dv*xShift, yTop - (ind+6.9)*yShift, '{:.1f}'.format(pddf[2]),
+    #          fontdict=fonts[2], size=fs)
 
     for ind2, i2 in enumerate(T_zpcl):  # here add information on specific net balance and AAR
         if ((ind2 + 1) % 2) == 0:
             colo = 'b'
         else:
             colo = 'r'
-        ax1.text(xLeft, yTop - (ind + 8 + 0.7 * ind2) * yShift, r'B'+str(ind2 + 1) +
+        ax1.text(xLeft, yTop - (ind + 1.5 + 0.7 * ind2) * yShift, r'B'+str(ind2 + 1) +
                  ' (m w.e.): ', fontdict=fonts[2], color=colo, size=fs)
-        ax1.text(xLeft+dv*xShift, yTop - (ind + 8 + 0.7 * ind2) * yShift, '{:.3f}'.format(B_glw[ind2]),
+        ax1.text(xLeft+dv*xShift, yTop - (ind + 1.5 + 0.7 * ind2) * yShift, '{:.3f}'.format(B_glw[ind2]),
                  fontdict=fonts[2], color=colo, size=fs)
-        ax1.text(xLeft, yTop - (ind + 8 + 0.7 * (ind2+len(T_zpcl))) * yShift, r'AAR'+str(ind2+1)+' (-): ',
+        ax1.text(xLeft, yTop - (ind + 1.5 + 0.7 * (ind2+len(T_zpcl))) * yShift, r'AAR'+str(ind2+1)+' (-): ',
                  fontdict=fonts[2], color=colo, size=fs)
-        ax1.text(xLeft+dv*xShift, yTop - (ind + 8+0.7*(ind2+len(T_zpcl))) * yShift, '{:.3f}'.format(AAR[ind2]),
+        ax1.text(xLeft+dv*xShift, yTop - (ind + 1.5 + 0.7*(ind2+len(T_zpcl))) * yShift, '{:.3f}'.format(AAR[ind2]),
                  fontdict=fonts[2], color=colo, size=fs)
-
-    # rect = patches.Rectangle((xLeft, yTop - (ind+2.5)*yShift), (maxB - minB)*2.8/8, -4.9*yShift,
-    #                      linewidth=0, edgecolor='none', facecolor='white',
-    #                      alpha=0.8, zorder = 2)
-
-    # Add the patch to the Axes
-    # ax1.add_patch(rect)
 
     # All three plots: Labelling
     ax1.axis([minB, maxB, zmm[1], zmm[0]])
     ax1.set_ylabel('elevation $z$ (m a.s.l.)')
     ax1.set_xlabel('$b$ (m w.e.)')
     ax2.set_xlabel('A (in 1000 km$^2$)')
-    ax1.set_title('surface mass balance', fontdict=fonts[2])
+    ax1.set_title('surface mass balance $b$', fontdict=fonts[2])
     ax2.set_title('hypsometry', fontdict=fonts[2])
-    # if T_offset != 0 or p_offset != 0:
-    #     ax3.set_title('$\Delta b$ (B4-B2; B3-B1)', fontdict=fonts[2])
-    # else:
-    #     ax3.set_title('$\Delta b$ (B2-B1)', fontdict=fonts[2])
     ax3.set_title('$\Delta b$ (B2-B1)', fontdict=fonts[2])
     ax3.set_xlabel('$\Delta b$ (m w.e.)')
     plt.tight_layout()

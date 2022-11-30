@@ -48,15 +48,17 @@ if __name__=='__main__': # required to use parallel computation under Windows
 
     p_a = [0.0002857] * 4 # () factor a in: p = a*z + b, where z is elevation and p is present-day annual precip
     p_b = [1.1412] * 4 # (m) factor b in: p = a*z + b, where z is elevation and p is present-day annual precip
-    #psi = [0.0704, 0.0704]  # () psi in: p_scale = exp(psi * delta_T_lgm), Huybrechts (2002); set 0 for p_scale = 1.
+    #psi = [0.028, 0.028]  # () psi in: p_scale = exp(psi * delta_T_lgm), Huybrechts (2002); set 0 for p_scale = 1.
     #psi = [0.0704, 0.028]  # () psi in: p_scale = exp(psi * delta_T_lgm), Huybrechts (2002); set 0 for p_scale = 1.
     psi = [0.0704, 0.0704, 0.0704, 0.028]  # () psi in: p_scale = exp(psi * delta_T_lgm), Huybrechts (2002); set 0 for p_scale = 1.
 
     # Calculating refreezing of meltwater. Two parameterizations can be used, either 'Reeh91' or 'Pfeffer91-Reeh05'
     # 'Reeh91' uses fixed fraction of snow w.e. to calculate amount of meltwater that refreezes before runoff starts
     # 'Pfeffer91-Reeh05' calculates fraction of snow w.e. based on firn T (using MAAT)
-    refreeze = [False] * 4 # specify whether refreezing of meltwater is simulated
-    # refreeze_parameterization = ['Reeh91'] * 4 # parameterization to be used
+    refreeze = [True] * 4 # specify whether refreezing of meltwater is simulated
+    #refreeze = [False, True]
+
+    #refreeze_parameterization = ['Reeh91'] * 2 # parameterization to be used
     refreeze_parameterization = ['Pfeffer91-Reeh05'] * 4 # parameterization to be used
 
     pddf = [3.297, 6, 8.791]  # (mm K-1 d-1) degree day factors, first for snow, second for firn, third for ice
@@ -70,9 +72,9 @@ if __name__=='__main__': # required to use parallel computation under Windows
 
     # Table of annual air temperature. Comment out to trigger linear run over a duration of "t_years"
     #climate = r'C:/Horst/modeling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'
-    climate = r'G:/_temp_modelling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'
+    climate = r'M:/_temp_modelling/modelanalysis/dbdz/T_lastGlacial_kindler_et_al_2014_annual.xlsx'
 
-    # Note that delta_T_lgm, that is MAAT difference between present-day and LGM (coldest) conditions,
+    # Note that delta_T_lgm (MAAT difference between present-day and LGM (coldest) conditions)
     # is not explicitly defined. Instead, it is specified implicitly by chosing values for T_zpcl_pd and
     # T_zpcl_lgm.
 
@@ -81,9 +83,10 @@ if __name__=='__main__': # required to use parallel computation under Windows
 
     # Start and end year BP of model run. Model runs from higher to lower year numbers. Used if climate table.
     #year_start = 122900  # (years BP)
-    year_start = 27200  # (years BP)
+    #year_start = 47300 # (years BP)
+    year_start = 25100  # (years BP)
     #year_end = 10100  # (years BP)
-    year_end = 27000  # (years BP)
+    year_end = 25000  # (years BP)
 
     # Mean annual air temperature at elevation z_stat and coldest phase (LGM), in Kelvin
     #T_zpcl_lgm = [270.9, 264.65]  # (K)
@@ -97,7 +100,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
     # ----------------------------------------- Specify hypsometry -------------------------------------------------
     #hypsometry = r'C:/Horst/modeling/modelanalysis/dbdz/s1_hypsometry_mod.xlsx'
     #hypsometry = r'C:/Users/Horst/switchdrive/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod.xlsx'
-    hypsometry = r'G:/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod_v2.xlsx'
+    hypsometry = r'M:/_temp_modelling/modelanalysis/dbdz/s1_hypsometry_mod_v2.xlsx'
     #hypsometry = r'C:/Horst/modeling/modelanalysis/dbdz/s2_hypsometry.xlsx'
 
     parallel_ts = 100. # (mass balance years) threshold for use of parallel computing (recommended around 100).
@@ -106,7 +109,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
     #outfolder = r'C:/Horst/modeling/modelanalysis/dbdz/'
     #outfolder = r'C:/Users/Horst/switchdrive/_temp_modelling/modeloutput/dbdz/'
     #outfolder = r'C:/Users/machguth/switchdrive/_temp_modelling/modeloutput/test/'
-    outfolder = r'G:/_temp_modelling/modeloutput/SMB_test_27200_27000_norefreeze/'
+    outfolder = r'M:/_temp_modelling/modeloutput/SMB_test_25100_25000/'
     # --------------------------
 
     # #############################################  preparations  ####################################################
