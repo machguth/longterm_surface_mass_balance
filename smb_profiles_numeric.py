@@ -83,10 +83,10 @@ if __name__=='__main__': # required to use parallel computation under Windows
 
     # Start and end year BP of model run. Model runs from higher to lower year numbers. Used if climate table.
     #year_start = 122900  # (years BP)
-    #year_start = 47300 # (years BP)
-    year_start = 25100  # (years BP)
-    #year_end = 10100  # (years BP)
-    year_end = 25000  # (years BP)
+    year_start = 47300 # (years BP)
+    #year_start = 25100  # (years BP)
+    year_end = 10100  # (years BP)
+    #year_end = 25000  # (years BP)
 
     # Mean annual air temperature at elevation z_stat and coldest phase (LGM), in Kelvin
     #T_zpcl_lgm = [270.9, 264.65]  # (K)
@@ -109,7 +109,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
     #outfolder = r'C:/Horst/modeling/modelanalysis/dbdz/'
     #outfolder = r'C:/Users/Horst/switchdrive/_temp_modelling/modeloutput/dbdz/'
     #outfolder = r'C:/Users/machguth/switchdrive/_temp_modelling/modeloutput/test/'
-    outfolder = r'M:/_temp_modelling/modeloutput/SMB_test_25100_25000/'
+    outfolder = r'M:/_temp_modelling/modeloutput/SMB_47300_10100/'
     # --------------------------
 
     # #############################################  preparations  ####################################################
