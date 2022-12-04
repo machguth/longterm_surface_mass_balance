@@ -83,15 +83,16 @@ if __name__=='__main__': # required to use parallel computation under Windows
 
     # Start and end year BP of model run. Model runs from higher to lower year numbers. Used if climate table.
     #year_start = 122900  # (years BP)
-    #year_start = 47300 # (years BP)
-    year_start = 23820  # (years BP)
-    #year_end = 10100  # (years BP)
-    year_end = 23720  # (years BP)
+    year_start = 47300 # (years BP)
+    #year_start = 23820  # (years BP)
+    year_end = 10100  # (years BP)
+    #year_end = 23720  # (years BP)
 
     # Mean annual air temperature at elevation z_stat and coldest phase (LGM), in Kelvin
     #T_zpcl_lgm = [270.9, 264.65]  # (K)
     #T_zpcl_lgm = [266.9, 266.9]  # (K)
-    T_zpcl_lgm = [270.9, 264.65, 266.9, 266.9]  # (K)
+    #T_zpcl_lgm = [270.9, 264.65, 266.9, 266.9]  # (K)
+    T_zpcl_lgm = [271.9, 265.65, 267.9, 267.9]  # (K)
 
     # correct for polar amplification (i.e. polar temperature variability > mid-latitudinal T variability)
     T_climate_pd = -29  # (°C) Temperature in 'climate' that corresponds to present-day T at T_zpcl (delta_T_lgm == 0)
@@ -109,7 +110,7 @@ if __name__=='__main__': # required to use parallel computation under Windows
     #outfolder = r'C:/Horst/modeling/modelanalysis/dbdz/'
     #outfolder = r'C:/Users/Horst/switchdrive/_temp_modelling/modeloutput/dbdz/'
     #outfolder = r'C:/Users/machguth/switchdrive/_temp_modelling/modeloutput/test/'
-    outfolder = r'M:/_temp_modelling/modeloutput/SMB_23820_23720/'
+    outfolder = r'M:/_temp_modelling/modeloutput/SMB_47300_10100_v2/'
     # --------------------------
 
     # #############################################  preparations  ####################################################
